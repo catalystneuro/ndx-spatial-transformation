@@ -1,66 +1,165 @@
 groups:
-  - neurodata_type_def: AffineTransformation
+  # Base class for all spatial transformations
+  - neurodata_type_def: SpatialTransformation
     neurodata_type_inc: NWBContainer
-    doc: "A class to store parameters of a 2D  transformation."
+    doc: |
+      Base class for spatial transformations used in image registration and coordinate mapping.
+      Supports transformations between different coordinate spaces (e.g., image space to atlas space).
+
+  # Rigid transformation (rotation + translation)
+  - neurodata_type_def: RigidTransformation
+    neurodata_type_inc: SpatialTransformation
+    doc: |
+      Rigid body transformation preserving distances and angles.
+      For 2D: 3 DOF (1 rotation + 2 translations)
+      For 3D: 6 DOF (3 rotations + 3 translations)
     datasets:
-      - name: rotation
+      - name: rotation_matrix
+        neurodata_type_inc: VectorData
         dtype: float
+        doc: "Rotation matrix. Shape: (2, 2) for 2D or (3, 3) for 3D."
         shape:
-          - 2
-          - 2
-        doc: "Rotation angles (in degrees) of the  transformation."
+          - null
+          - null
+        dims:
+          - rows
+          - cols
+        required: true
 
-      - name: translation
+      - name: translation_vector
+        neurodata_type_inc: VectorData
         dtype: float
+        doc: "Translation vector. Shape: (2,) for 2D or (3,) for 3D."
         shape:
-          - 2
-        doc: "Translation vector of the  transformation."
+          - null
+        dims:
+          - dimensions
+        required: true
 
+      - name: center_of_rotation
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Center point for rotation. Shape: (2,) for 2D or (3,) for 3D. Optional."
+        shape:
+          - null
+        dims:
+          - dimensions
+        required: false
+
+  # Similarity transformation (rotation + translation + uniform scaling)
+  - neurodata_type_def: SimilarityTransformation
+    neurodata_type_inc: RigidTransformation
+    doc: |
+      Similarity transformation preserving angles but not distances.
+      For 2D: 4 DOF (1 rotation + 2 translations + 1 scale)
+      For 3D: 7 DOF (3 rotations + 3 translations + 1 scale)
+    datasets:
       - name: scale
+        neurodata_type_inc: VectorData
         dtype: float
+        doc: "Uniform scaling factor (single value)."
         shape:
-          - 2
-          - 2
-        doc: "Scaling factor of the  transformation."
+          - 1
+        required: true
 
+  # Affine transformation (rotation + translation + scaling + shearing)
+  - neurodata_type_def: AffineTransformation
+    neurodata_type_inc: SpatialTransformation
+    doc: |
+      Affine transformation preserving parallel lines.
+      For 2D: 6 DOF (rotation, translation, scaling, shearing)
+      For 3D: 12 DOF (rotation, translation, scaling, shearing)
+    datasets:
+      - name: affine_matrix
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: |
+          Affine transformation matrix in homogeneous coordinates.
+          Shape: (3, 3) for 2D or (4, 4) for 3D.
+          Last row is [0, 0, ..., 1] for homogeneous representation.
+        shape:
+          - null
+          - null
+        dims:
+          - rows
+          - cols
+        required: true
+
+  # Landmarks with associated transformation
   - neurodata_type_def: Landmarks
     neurodata_type_inc: DynamicTable
-    doc: "A class to store 2D spatial landmarks annotated on an image and their  transformation."
+    doc: |
+      Spatial landmarks annotated on an image with their coordinates in both
+      source and target spaces, along with the associated spatial transformation.
     links:
-      - target_type: Transformation
-        quantity: 1
-        doc: "The  transformation associated with the landmarks."
-        name: _transformation
+      - target_type: SpatialTransformation
+        quantity: "?"
+        doc: "The spatial transformation mapping source to target coordinates."
+        name: transformation
+
       - target_type: Image
-        quantity: 1
-        doc: "The image associated with the coordinates"
-        name: image
+        quantity: "?"
+        doc: "The source image associated with the landmarks."
+        name: source_image
+
+      - target_type: Image
+        quantity: "?"
+        doc: "The target/registered image (optional)."
+        name: target_image
 
     datasets:
-      - name: x_pixel_coordinates
+      - name: source_coordinates
         neurodata_type_inc: VectorData
         dtype: float
-        doc: "X pixel coordinate of each landmark in the image space."
+        doc: |
+          Coordinates of each landmark in the source space.
+          Shape: (n_landmarks, dimensionality)
+        dims:
+          - landmarks
+          - dimensions
+        shape:
+          - null
+          - null
 
-      - name: y_pixel_coordinates
+      - name: target_coordinates
         neurodata_type_inc: VectorData
         dtype: float
-        doc: "Y pixel coordinate of each landmark in the image space."
+        doc: |
+          Coordinates of each landmark in the target/registered space.
+          Shape: (n_landmarks, dimensionality)
+        dims:
+          - landmarks
+          - dimensions
+        shape:
+          - null
+          - null
+        required: false
 
-      - name: registered_x_pixel_coordinates
+      - name: landmark_labels
         neurodata_type_inc: VectorData
         dtype: text
-        doc: "X pixel coordinate of each landmark in the registered space."
+        doc: "Optional labels or names for each landmark."
+        required: false
 
-      - name: registered_y_pixel_coordinates
+      - name: confidence
         neurodata_type_inc: VectorData
-        dtype: text
-        doc: "Y pixel coordinate of each landmark in the registered space."
+        dtype: float
+        doc: "Optional confidence scores for each landmark (0-1)."
+        required: false
 
-  - neurodata_type_def: LandmarksMetaData
+  # Container for storing multiple transformations
+  - neurodata_type_def: SpatialTransformationMetadata
     neurodata_type_inc: LabMetaData
-    doc: "Metadata storing multiple landmark sets and their spatial transform."
+    doc: |
+      Metadata container for storing spatial transformations and landmarks.
+      Use this to organize multiple transformations associated with your experiment.
     groups:
+      - name: transformations
+        neurodata_type_inc: SpatialTransformation
+        doc: "Collection of spatial transformations."
+        quantity: "*"
+
       - name: landmarks
         neurodata_type_inc: Landmarks
-        doc: "Landmarks annotated on an image and their transformation."
+        doc: "Collection of landmark sets."
+        quantity: "*"

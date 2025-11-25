@@ -16,15 +16,21 @@ load_namespaces(str(__spec_path))
 # Either have PyNWB generate a class from the spec using `get_class` as shown
 # below or write a custom class and register it using the class decorator
 # `@register_class("TetrodeSeries", "ndx-spatial-transformation")`
-spatialTransformation = get_class("spatialTransformation", "ndx-spatial-transformation")
+SpatialTransformation = get_class("SpatialTransformation", "ndx-spatial-transformation")
+RigidTransformation = get_class("RigidTransformation", "ndx-spatial-transformation")
+SimilarityTransformation = get_class("SimilarityTransformation", "ndx-spatial-transformation")
+AffineTransformation = get_class("AffineTransformation", "ndx-spatial-transformation")
 Landmarks = get_class("Landmarks", "ndx-spatial-transformation")
-LandmarksMetaData = get_class("LandmarksMetaData", "ndx-spatial-transformation")
+SpatialTransformationMetadata = get_class("SpatialTransformationMetadata", "ndx-spatial-transformation")
 
 # TODO: Add all classes to __all__ to make them accessible at the package level
 __all__ = [
-    "spatialTransformation",
+    "SpatialTransformation",
+    "RigidTransformation",
+    "SimilarityTransformation",
+    "AffineTransformation",
     "Landmarks",
-    "LandmarksMetaData",
+    "SpatialTransformationMetadata",
 ]
 
 # Remove these functions/modules from the package
