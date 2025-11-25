@@ -1,9 +1,61 @@
 groups:
-- neurodata_type_def: TetrodeSeries
-  neurodata_type_inc: ElectricalSeries
-  doc: An extension of ElectricalSeries to include the tetrode ID for each time 
-    series.
-  attributes:
-  - name: trode_id
-    dtype: int32
-    doc: The tetrode ID.
+  - neurodata_type_def: RigidTransformation
+    neurodata_type_inc: NWBContainer
+    doc: "A class to store parameters of a 2D rigid transformation."
+    datasets:
+      - name: rotation_matrix
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Rotation angle (in degrees) of the rigid transformation."
+
+      - name: translation_matrix
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Translation matrix of the rigid transformation."
+
+      - name: scale_matrix
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Scaling factor of the rigid transformation."
+
+  - neurodata_type_def: Landmarks
+    neurodata_type_inc: DynamicTable
+    doc: "A class to store 2D spatial landmarks annotated on an image and their rigid transformation."
+    links:
+      - target_type: RigidTransformation
+        quantity: 1
+        doc: "The rigid transformation associated with the landmarks."
+        name: rigid_transformation
+      - target_type: Image
+        quantity: 1
+        doc: "The image associated with the coordinates"
+        name: image
+
+    datasets:
+      - name: x_pixel_coordinates
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "X pixel coordinate of each landmark in the image space."
+
+      - name: y_pixel_coordinates
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Y pixel coordinate of each landmark in the image space."
+
+      - name: registered_x_pixel_coordinates
+        neurodata_type_inc: VectorData
+        dtype: text
+        doc: "X pixel coordinate of each landmark in the registered space."
+
+      - name: registered_y_pixel_coordinates
+        neurodata_type_inc: VectorData
+        dtype: text
+        doc: "Y pixel coordinate of each landmark in the registered space."
+
+  - neurodata_type_def: LandmarksMetaData
+    neurodata_type_inc: LabMetaData
+    doc: "Metadata storing multiple landmark sets and their spatial transform."
+    groups:
+      - name: landmarks
+        neurodata_type_inc: Landmarks
+        doc: "Landmarks annotated on an image and their rigid transformation."
