@@ -15,7 +15,6 @@ groups:
       For 3D: 6 DOF (3 rotations + 3 translations)
     datasets:
       - name: rotation_matrix
-        neurodata_type_inc: VectorData
         dtype: float
         doc: "Rotation matrix. Shape: (2, 2) for 2D or (3, 3) for 3D."
         shape:
@@ -27,7 +26,6 @@ groups:
         required: true
 
       - name: translation_vector
-        neurodata_type_inc: VectorData
         dtype: float
         doc: "Translation vector. Shape: (2,) for 2D or (3,) for 3D."
         shape:
@@ -37,7 +35,6 @@ groups:
         required: true
 
       - name: center_of_rotation
-        neurodata_type_inc: VectorData
         dtype: float
         doc: "Center point for rotation. Shape: (2,) for 2D or (3,) for 3D. Optional."
         shape:
@@ -55,7 +52,6 @@ groups:
       For 3D: 7 DOF (3 rotations + 3 translations + 1 scale)
     datasets:
       - name: scale
-        neurodata_type_inc: VectorData
         dtype: float
         doc: "Uniform scaling factor (single value)."
         shape:
@@ -71,7 +67,6 @@ groups:
       For 3D: 12 DOF (rotation, translation, scaling, shearing)
     datasets:
       - name: affine_matrix
-        neurodata_type_inc: VectorData
         dtype: float
         doc: |
           Affine transformation matrix in homogeneous coordinates.
