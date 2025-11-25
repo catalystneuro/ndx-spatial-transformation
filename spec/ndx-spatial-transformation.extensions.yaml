@@ -1,31 +1,36 @@
 groups:
-  - neurodata_type_def: RigidTransformation
+  - neurodata_type_def: AffineTransformation
     neurodata_type_inc: NWBContainer
-    doc: "A class to store parameters of a 2D rigid transformation."
+    doc: "A class to store parameters of a 2D  transformation."
     datasets:
-      - name: rotation_matrix
-        neurodata_type_inc: VectorData
+      - name: rotation
         dtype: float
-        doc: "Rotation angle (in degrees) of the rigid transformation."
+        shape:
+          - 2
+          - 2
+        doc: "Rotation angles (in degrees) of the  transformation."
 
-      - name: translation_matrix
-        neurodata_type_inc: VectorData
+      - name: translation
         dtype: float
-        doc: "Translation matrix of the rigid transformation."
+        shape:
+          - 2
+        doc: "Translation vector of the  transformation."
 
-      - name: scale_matrix
-        neurodata_type_inc: VectorData
+      - name: scale
         dtype: float
-        doc: "Scaling factor of the rigid transformation."
+        shape:
+          - 2
+          - 2
+        doc: "Scaling factor of the  transformation."
 
   - neurodata_type_def: Landmarks
     neurodata_type_inc: DynamicTable
-    doc: "A class to store 2D spatial landmarks annotated on an image and their rigid transformation."
+    doc: "A class to store 2D spatial landmarks annotated on an image and their  transformation."
     links:
-      - target_type: RigidTransformation
+      - target_type: Transformation
         quantity: 1
-        doc: "The rigid transformation associated with the landmarks."
-        name: rigid_transformation
+        doc: "The  transformation associated with the landmarks."
+        name: _transformation
       - target_type: Image
         quantity: 1
         doc: "The image associated with the coordinates"
@@ -58,4 +63,4 @@ groups:
     groups:
       - name: landmarks
         neurodata_type_inc: Landmarks
-        doc: "Landmarks annotated on an image and their rigid transformation."
+        doc: "Landmarks annotated on an image and their transformation."

@@ -1,10 +1,10 @@
 
 
-# Next Steps for ndx-rigid-transformation Extension for NWB
+# Next Steps for ndx-spatial-transformation Extension for NWB
 
 ## Creating Your Extension
 
-1. In a terminal, change directory into the new ndx-rigid-transformation directory: `cd ndx-rigid-transformation`
+1. In a terminal, change directory into the new ndx-spatial-transformation directory: `cd ndx-spatial-transformation`
 
 2. Add any packages required by your extension to the `[project] dependencies` or `[project.optional-dependencies]` 
 section of `pyproject.toml`.
@@ -15,12 +15,12 @@ and any other packages required to develop, document, and run your extension.
 4. Modify `src/spec/create_extension_spec.py` to define your extension.
 
 5. Run `python src/spec/create_extension_spec.py` to generate the
-`spec/ndx-rigid-transformation.namespace.yaml` and
-`spec/ndx-rigid-transformation.extensions.yaml` files.
+`spec/ndx-spatial-transformation.namespace.yaml` and
+`spec/ndx-spatial-transformation.extensions.yaml` files.
 
 6. Define API classes for your new extension data types.
 
-    - As a starting point, `src/pynwb/ndx_rigid_transformation/__init__.py` includes an
+    - As a starting point, `src/pynwb/ndx_spatial_transformation/__init__.py` includes an
       example for how to use
       the `pynwb.get_class` to generate a basic Python class for your new extension data
       type. This class contains a constructor and properties for the new data type.
@@ -31,7 +31,7 @@ and any other packages required to develop, document, and run your extension.
       for more details.
 
 7. Define tests for your new extension data types in 
-`src/pynwb/ndx_rigid_transformation/tests` or `src/matnwb/tests`.
+`src/pynwb/ndx_spatial_transformation/tests` or `src/matnwb/tests`.
 A test for the example `TetrodeSeries` data type is provided as a reference and should be
 replaced or removed.
 
@@ -52,10 +52,10 @@ replaced or removed.
 )
 
 7. (Optional) Define custom visualization widgets for your new extension data types in
-`src/pynwb/ndx_rigid_transformation/widgets` so that the visualizations can be displayed with
+`src/pynwb/ndx_spatial_transformation/widgets` so that the visualizations can be displayed with
 [nwbwidgets](https://github.com/NeurodataWithoutBorders/nwbwidgets).
 You will also need to update the `vis_spec` dictionary in 
-`src/pynwb/ndx_rigid_transformation/widgets/__init__.py` so that
+`src/pynwb/ndx_spatial_transformation/widgets/__init__.py` so that
 nwbwidgets can find your custom visualizations.
 
 8. You may need to modify `pyproject.toml` and re-run `python -m pip install -e .` if you
@@ -68,7 +68,7 @@ use any dependencies.
 
 1. Install the latest release of hdmf_docutils: `python -m pip install hdmf-docutils`
 
-2. Start a git repository for your extension directory ndx-rigid-transformation
+2. Start a git repository for your extension directory ndx-spatial-transformation
  and push it to GitHub. You will need a GitHub account.
     - Follow these directions:
   https://help.github.com/en/articles/adding-an-existing-project-to-github-using-the-command-line
@@ -93,12 +93,12 @@ links in the documentation. For the code coverage workflow to work, you will nee
 set up the repo on codecov.io and uncomment the "Upload coverage to Codecov" step
 in `.github/workflows/run_coverage.yml`.
 
-8. Make a release for the extension on GitHub with the version number specified. e.g. if version is 0.1.0, then this page should exist: https://github.com/alessandratrapani/ndx-rigid-transformation/releases/tag/0.1.0 . For instructions on how to make a release on GitHub see [here](https://help.github.com/en/github/administering-a-repository/creating-releases).
+8. Make a release for the extension on GitHub with the version number specified. e.g. if version is 0.1.0, then this page should exist: https://github.com/alessandratrapani/ndx-spatial-transformation/releases/tag/0.1.0 . For instructions on how to make a release on GitHub see [here](https://help.github.com/en/github/administering-a-repository/creating-releases).
 
 9. Publish your updated extension on [PyPI](https://pypi.org/).
     - Follow these directions: https://packaging.python.org/en/latest/tutorials/packaging-projects/
     - You may need to modify `pyproject.toml`
-    - If your extension version is 0.1.0, then this page should exist: https://pypi.org/project/ndx-rigid-transformation/0.1.0
+    - If your extension version is 0.1.0, then this page should exist: https://pypi.org/project/ndx-spatial-transformation/0.1.0
 
    Once your GitHub release and `pyproject.toml` are ready, publishing on PyPI:
     ```bash
@@ -113,13 +113,13 @@ repository.
 11. Clone the fork onto your local filesystem.
 
 12. Copy the directory `staged-extensions/example` to a new directory
-`staged-extensions/ndx-rigid-transformation`:
+`staged-extensions/ndx-spatial-transformation`:
 
     ```bash
-    cp -r staged-extensions/example staged-extensions/ndx-rigid-transformation
+    cp -r staged-extensions/example staged-extensions/ndx-spatial-transformation
     ```
 
-13. Edit `staged-extensions/ndx-rigid-transformation/ndx-meta.yaml`
+13. Edit `staged-extensions/ndx-spatial-transformation/ndx-meta.yaml`
 with information on where to find your NWB extension.
     - The YAML file MUST contain a dict with the following keys:
       - name: extension namespace name
@@ -131,29 +131,29 @@ with information on where to find your NWB extension.
     - You may copy and modify the following YAML that was auto-generated:
 
       ```yaml
-      name: ndx-rigid-transformation
+      name: ndx-spatial-transformation
       version: 0.1.0
-      src: https://github.com/alessandratrapani/ndx-rigid-transformation
-      pip: https://pypi.org/project/ndx-rigid-transformation/
+      src: https://github.com/alessandratrapani/ndx-spatial-transformation
+      pip: https://pypi.org/project/ndx-spatial-transformation/
       license: BSD-3-Clause
       maintainers: 
         - alessandratrapani
         - weiglszonja
       ```
 
-14. Edit `staged-extensions/ndx-rigid-transformation/README.md`
+14. Edit `staged-extensions/ndx-spatial-transformation/README.md`
 to add information about your extension. You may copy it from
-`ndx-rigid-transformation/README.md`.
+`ndx-spatial-transformation/README.md`.
 
   ```bash
-  cp ndx-rigid-transformation/README.md staged-extensions/ndx-rigid-transformation/README.md
+  cp ndx-spatial-transformation/README.md staged-extensions/ndx-spatial-transformation/README.md
   ```
 
 15. Add and commit your changes to Git and push your changes to GitHub.
 ```
 cd staged-extensions
-git add ndx-rigid-transformation
-git commit -m "Add new catalog entry for ndx-rigid-transformation" .
+git add ndx-spatial-transformation
+git commit -m "Add new catalog entry for ndx-spatial-transformation" .
 git push
 ```
 
@@ -162,17 +162,17 @@ Mac, and Linux. The technical team will review your extension shortly after
 and provide feedback and request changes, if any.
 
 17. When your pull request is merged, a new repository, called
-ndx-rigid-transformation-record will be created in the nwb-extensions
+ndx-spatial-transformation-record will be created in the nwb-extensions
 GitHub organization and you will be added as a maintainer for that repository.
 
 
 ## Updating Your Published Extension
 
-1. Update your ndx-rigid-transformation GitHub repository.
+1. Update your ndx-spatial-transformation GitHub repository.
 
 2. Publish your updated extension on PyPI.
 
-3. Fork the ndx-rigid-transformation-record repository on GitHub.
+3. Fork the ndx-spatial-transformation-record repository on GitHub.
 
 4. Open a pull request to test the changes automatically. The technical team
 will review your changes shortly after and provide feedback and request changes,

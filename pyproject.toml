@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ndx-rigid-transformation"
+name = "ndx-spatial-transformation"
 version = "0.1.0"
 authors = [
     { name="Alessandra Trapani", email="alessandra.trapani@catalystneuro.com" },
     { name="Szonja Weigl", email="szonja.weigl@catalystneuro.com" },
 ]
-description = "An extension to store data on rigid transformation"
+description = "An extension to store data on spatial transformation"
 readme = "README.md"
 requires-python = ">=3.9"
 license = "BSD-3-Clause"
@@ -55,7 +55,7 @@ dev = [
     "codespell>=2.3.0",
     "pre-commit>=3.5.0",
     "ruff>=0.4.10",
-    "ndx-rigid-transformation[docs,test]",
+    "ndx-spatial-transformation[docs,test]",
 ]
 
 # minimum requirements of project dependencies for testing (see .github/workflows/run_all_tests.yml)
@@ -72,23 +72,23 @@ min-reqs = [
 # "Discussions" = "https://github.com/organization/package/discussions"
 # "Changelog" = "https://github.com/organization/package/blob/main/CHANGELOG.md"
 
-# Include only the source code under `src/pynwb/ndx_rigid_transformation` and the spec files under `spec`
+# Include only the source code under `src/pynwb/ndx_spatial_transformation` and the spec files under `spec`
 # in the wheel.
 [tool.hatch.build.targets.wheel]
 packages = [
-    "src/pynwb/ndx_rigid_transformation",
+    "src/pynwb/ndx_spatial_transformation",
     "spec"
 ]
 
-# Rewrite the path to the `spec` directory to `ndx_rigid_transformation/spec`.
-# `ndx_rigid_transformation/__init__.py` will look there first for the spec files.
+# Rewrite the path to the `spec` directory to `ndx_spatial_transformation/spec`.
+# `ndx_spatial_transformation/__init__.py` will look there first for the spec files.
 # The resulting directory structure within the wheel will be:
-# ndx_rigid_transformation/
+# ndx_spatial_transformation/
 # ├── __init__.py
 # ├── spec
 # └── widgets
 [tool.hatch.build.targets.wheel.sources]
-"spec" = "ndx_rigid_transformation/spec"
+"spec" = "ndx_spatial_transformation/spec"
 
 # The source distribution includes everything in the package except for the `src/matnwb` directory and
 # git and github-related files.
@@ -107,7 +107,7 @@ skip = "htmlcov,.git,.mypy_cache,.pytest_cache,.coverage,*.pdf,*.svg,venvs,.tox,
 
 [tool.coverage.run]
 branch = true
-source = ["ndx_rigid_transformation"]
+source = ["ndx_spatial_transformation"]
 
 [tool.coverage.report]
 exclude_lines = [

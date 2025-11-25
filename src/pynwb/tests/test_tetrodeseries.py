@@ -11,7 +11,7 @@ from pynwb.testing.mock.ecephys import mock_ElectrodeGroup, mock_ElectrodeTable
 from pynwb.testing.mock.file import mock_NWBFile
 from pynwb.testing import TestCase, remove_test_file, NWBH5IOFlexMixin
 
-from ndx_rigid_transformation import TetrodeSeries
+from ndx_spatial_transformation import TetrodeSeries
 
 
 def set_up_nwbfile(nwbfile: NWBFile = None):

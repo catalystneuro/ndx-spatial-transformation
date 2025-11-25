@@ -155,7 +155,7 @@ jobs:
         run: python -m pip install archive/archive.tgz
 
       - name: Check installed package
-        run: python -c "import ndx_rigid_transformation"
+        run: python -c "import ndx_spatial_transformation"
 
       - name: Checkout repo to access tests
         uses: actions/checkout@v4

@@ -5,9 +5,9 @@ namespaces:
   contact:
   - alessandra.trapani@catalystneuro.com
   - szonja.weigl@catalystneuro.com
-  doc: An extension to store data on rigid transformation
-  name: ndx-rigid-transformation
+  doc: An extension to store data on spatial transformation
+  name: ndx-spatial-transformation
   schema:
   - namespace: core
-  - source: ndx-rigid-transformation.extensions.yaml
+  - source: ndx-spatial-transformation.extensions.yaml
   version: 0.1.0

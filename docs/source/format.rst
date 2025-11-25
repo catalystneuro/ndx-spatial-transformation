@@ -1,8 +1,8 @@
 
-.. _ndx-rigid-transformation:
+.. _ndx-spatial-transformation:
 
 ************************
-ndx-rigid-transformation
+ndx-spatial-transformation
 ************************
 
 Version |release| |today|

@@ -1,1 +1,1 @@
-# Changelog for ndx-rigid-transformation
+# Changelog for ndx-spatial-transformation

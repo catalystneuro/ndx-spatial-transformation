@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'ndx-rigid-transformation'
+project = 'ndx-spatial-transformation'
 copyright = '2025, Alessandra Trapani, Szonja Weigl'
 author = 'Alessandra Trapani, Szonja Weigl'
 

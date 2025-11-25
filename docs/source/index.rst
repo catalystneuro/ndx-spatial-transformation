@@ -1,4 +1,4 @@
-Specification for the ndx-rigid-transformation extension
+Specification for the ndx-spatial-transformation extension
 ========================================================
 
 .. toctree::

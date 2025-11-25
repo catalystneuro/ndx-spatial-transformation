@@ -1,6 +1,6 @@
-# ndx-rigid-transformation Extension for NWB
+# ndx-spatial-transformation Extension for NWB
 
-An extension to store data on rigid transformation
+An extension to store data on spatial transformation
 
 ## Installation
 

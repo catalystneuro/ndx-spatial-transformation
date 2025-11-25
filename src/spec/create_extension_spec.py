@@ -10,9 +10,9 @@ from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttrib
 def main():
     # these arguments were auto-generated from your cookiecutter inputs
     ns_builder = NWBNamespaceBuilder(
-        name="""ndx-rigid-transformation""",
+        name="""ndx-spatial-transformation""",
         version="""0.1.0""",
-        doc="""An extension to store data on rigid transformation""",
+        doc="""An extension to store data on spatial transformation""",
         author=[
             "Alessandra Trapani",
             "Szonja Weigl",
