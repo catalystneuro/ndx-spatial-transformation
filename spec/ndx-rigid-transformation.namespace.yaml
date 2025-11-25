@@ -1,0 +1,13 @@
+namespaces:
+- author:
+  - Alessandra Trapani
+  - Szonja Weigl
+  contact:
+  - alessandra.trapani@catalystneuro.com
+  - szonja.weigl@catalystneuro.com
+  doc: An extension to store data on rigid transformation
+  name: ndx-rigid-transformation
+  schema:
+  - namespace: core
+  - source: ndx-rigid-transformation.extensions.yaml
+  version: 0.1.0
