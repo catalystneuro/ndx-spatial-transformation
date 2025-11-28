@@ -18,7 +18,7 @@ If you want to install the development version of the extension you can install 
 The following command installs the development version of the extension:
 
 ```bash
-pip install -U git+https://github.com/catalystneuro/ndx-fscv.git
+pip install -U git+https://github.com/catalystneuro/ndx-spatial-transformation.git
 ```
 
 ## Usage
