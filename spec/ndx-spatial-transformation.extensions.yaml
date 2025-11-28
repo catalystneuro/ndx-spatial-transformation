@@ -23,8 +23,6 @@ groups:
         dims:
           - rows
           - cols
-        required: true
-
       - name: translation_vector
         dtype: float
         doc: "Translation vector. Shape: (2,) for 2D or (3,) for 3D."
@@ -32,8 +30,6 @@ groups:
           - null
         dims:
           - dimensions
-        required: true
-
       - name: center_of_rotation
         dtype: float
         doc: "Center point for rotation. Shape: (2,) for 2D or (3,) for 3D. Optional."
@@ -41,7 +37,7 @@ groups:
           - null
         dims:
           - dimensions
-        required: false
+        quantity: "?"   # optional dataset
 
   # Similarity transformation (rotation + translation + uniform scaling)
   - neurodata_type_def: SimilarityTransformation
@@ -56,7 +52,6 @@ groups:
         doc: "Uniform scaling factor (single value)."
         shape:
           - 1
-        required: true
 
   # Affine transformation (rotation + translation + scaling + shearing)
   - neurodata_type_def: AffineTransformation
@@ -78,7 +73,6 @@ groups:
         dims:
           - rows
           - cols
-        required: true
 
   # Landmarks with associated transformation
   - neurodata_type_def: Landmarks
@@ -128,19 +122,19 @@ groups:
         shape:
           - null
           - null
-        required: false
+        quantity: "?"   # optional dataset
 
       - name: landmark_labels
         neurodata_type_inc: VectorData
         dtype: text
         doc: "Optional labels or names for each landmark."
-        required: false
+        quantity: "?"   # optional dataset
 
       - name: confidence
         neurodata_type_inc: VectorData
         dtype: float
         doc: "Optional confidence scores for each landmark (0-1)."
-        required: false
+        quantity: "?"   # optional dataset
 
   # Container for storing multiple transformations
   - neurodata_type_def: SpatialTransformationMetadata
@@ -149,12 +143,10 @@ groups:
       Metadata container for storing spatial transformations and landmarks.
       Use this to organize multiple transformations associated with your experiment.
     groups:
-      - name: transformations
-        neurodata_type_inc: SpatialTransformation
+      - neurodata_type_inc: SpatialTransformation
         doc: "Collection of spatial transformations."
         quantity: "*"
 
-      - name: landmarks
-        neurodata_type_inc: Landmarks
+      - neurodata_type_inc: Landmarks
         doc: "Collection of landmark sets."
         quantity: "*"
