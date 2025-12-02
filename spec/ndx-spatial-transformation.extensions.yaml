@@ -16,10 +16,6 @@ groups:
       - name: rotation_angle
         dtype: float
         doc: "Rotation angle in radians. Single value for 2D rotation. Positive values indicate counter-clockwise rotation."
-        shape:
-          - 1
-        dims:
-          - angle
         required: true
 
       - name: translation_vector
@@ -48,8 +44,6 @@ groups:
       - name: scale
         dtype: float
         doc: "Uniform scaling factor (single value)."
-        shape:
-          - 1
 
   # Landmarks with associated transformation
   - neurodata_type_def: Landmarks
