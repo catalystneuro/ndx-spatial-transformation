@@ -16,7 +16,6 @@ groups:
       - name: rotation_angle
         dtype: float
         doc: "Rotation angle in radians. Single value for 2D rotation. Positive values indicate counter-clockwise rotation."
-        required: true
 
       - name: translation_vector
         dtype: float
