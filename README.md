@@ -21,7 +21,21 @@ The following command installs the development version of the extension:
 pip install -U git+https://github.com/catalystneuro/ndx-spatial-transformation.git
 ```
 
+The complete usage example below requires additional dependencies for image transformation. Install them with:
+```bash
+pip install ndx-spatial-transformation[wfield]
+```
+
+For developers, install all dependencies including testing and documentation tools:
+```bash
+git clone https://github.com/catalystneuro/ndx-spatial-transformation.git
+cd ndx-spatial-transformation
+pip install -e .[dev]
+```
+
 ## Usage
+
+**Note:** The example below requires the `wfield` package for image transformation. Install it with `pip install ndx-spatial-transformation[wfield]`.
 
 A minimal example of creating and writing an NWB file with a similarity transformation:
 
