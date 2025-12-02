@@ -62,6 +62,7 @@ class TestRigidTransformationRoundtrip(TestCase):
             self.assertEqual(read_rt.rotation_angle, rotation_angle)
             np.testing.assert_array_equal(read_rt.translation_vector, translation)
 
+
 class TestSimilarityTransformationRoundtrip(TestCase):
     """Roundtrip tests for SimilarityTransformation in an NWBFile."""
 
@@ -104,6 +105,7 @@ class TestSimilarityTransformationRoundtrip(TestCase):
             self.assertEqual(read_st.rotation_angle, rotation_angle)
             np.testing.assert_array_equal(read_st.translation_vector, translation)
             self.assertEqual(read_st.scale, scale)
+
 
 class TestLandmarksRoundtrip(TestCase):
     """Roundtrip tests for Landmarks in an NWBFile."""
@@ -174,14 +176,8 @@ class TestLandmarksRoundtrip(TestCase):
 
             self.assertEqual(len(read_lm.source_coordinates), 2)
             self.assertEqual(len(read_lm.target_coordinates), 2)
-            np.testing.assert_array_equal(
-                read_lm.source_coordinates[0],
-                np.array([0.0, 0.0])
-            )
-            np.testing.assert_array_equal(
-                read_lm.target_coordinates[0],
-                np.array([100.0, 100.0])
-            )
+            np.testing.assert_array_equal(read_lm.source_coordinates[0], np.array([0.0, 0.0]))
+            np.testing.assert_array_equal(read_lm.target_coordinates[0], np.array([100.0, 100.0]))
 
     def test_roundtrip_with_labels_and_confidence(self):
         """Landmarks with labels and confidence can be written and read back."""
@@ -621,4 +617,3 @@ class TestSpatialTransformationMetadataRoundtrip(TestCase):
             read_lm = read_meta.landmarks["test_landmarks"]
             self.assertIsNotNone(read_lm.transformation)
             self.assertEqual(read_lm.transformation.name, "rigid_transform")
-
