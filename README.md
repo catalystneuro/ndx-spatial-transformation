@@ -1,7 +1,7 @@
 # ndx-spatial-transformation Extension for NWB
 
-An extension to store data on spatial transformations, including rigid, similarity, and affine transforms, along with 
-landmark tables and a `SpatialTransformationMetadata` container for organizing them.
+An extension to store data on spatial transformations, including rigid, similarity, and landmark tables,
+and a `SpatialTransformationMetadata` container for organizing them.
 
 The specification is defined in `spec/ndx-spatial-transformation.extensions.yaml`
 and `spec/ndx-spatial-transformation.namespace.yaml`.
