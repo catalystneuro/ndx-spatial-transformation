@@ -51,6 +51,11 @@ docs = [
     "hdmf-docutils>=0.4.7",
 ]
 
+# Optional dependencies for using wfield image transformation function
+wfield = [
+  "wfield >= 0.6.0"
+]
+
 dev = [
     "black>=24.4.2",
     "codespell>=2.3.0",
