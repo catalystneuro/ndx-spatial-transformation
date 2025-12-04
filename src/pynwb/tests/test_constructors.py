@@ -84,6 +84,48 @@ class TestSimilarityTransformationConstructor(TestCase):
         np.testing.assert_array_equal(st.center_of_rotation, self.center_of_rotation)
         self.assertEqual(st.scale, self.scale)
 
+    def test_get_transform_matrix_values(self):
+        """SimilarityTransformation.get_transform_matrix should return an object with a 3x3 params matrix
+        and attributes reflecting the input scale, rotation, and translation.
+        """
+        tolerance = dict(rtol=1e-7, atol=1e-8)
+
+        st = SimilarityTransformation(
+            name="test_sim",
+            rotation_angle=self.rotation_angle,
+            translation_vector=self.translation,
+            scale=self.scale,
+        )
+
+        T = st.get_transform_matrix()
+
+        # The returned object should expose a 3x3 homogeneous matrix
+        assert hasattr(T, "params"), "Returned object must have 'params' attribute"
+        M = np.array(T.params)
+        assert M.shape == (3, 3)
+
+        # Expected homogeneous matrix for 2D similarity (scale * rotation) + translation
+        c = np.cos(self.rotation_angle)
+        s = np.sin(self.rotation_angle)
+        expected = np.array(
+            [
+                [self.scale * c, -self.scale * s, self.translation[0]],
+                [self.scale * s, self.scale * c, self.translation[1]],
+                [0.0, 0.0, 1.0],
+            ]
+        )
+
+        np.testing.assert_allclose(M, expected, **tolerance)
+        # The returned object should also expose scale, rotation, and translation attributes
+        # that match the inputs
+        assert hasattr(T, "scale")
+        assert hasattr(T, "rotation")
+        assert hasattr(T, "translation")
+
+        self.assertEqual(T.scale, self.scale)
+        np.testing.assert_allclose(T.rotation, self.rotation_angle, **tolerance)
+        np.testing.assert_allclose(np.array(T.translation), self.translation, **tolerance)
+
 
 class TestLandmarksConstructor(TestCase):
     """Unit tests for Landmarks constructor."""
