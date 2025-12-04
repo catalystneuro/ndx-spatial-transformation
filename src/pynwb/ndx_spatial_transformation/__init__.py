@@ -12,15 +12,60 @@ if not __spec_path.exists():
 # Load the namespace
 load_namespaces(str(__spec_path))
 
-# TODO: Define your classes here to make them accessible at the package level.
-# Either have PyNWB generate a class from the spec using `get_class` as shown
-# below or write a custom class and register it using the class decorator
-# `@register_class("TetrodeSeries", "ndx-spatial-transformation")`
+# Get base classes
 SpatialTransformation = get_class("SpatialTransformation", "ndx-spatial-transformation")
 RigidTransformation = get_class("RigidTransformation", "ndx-spatial-transformation")
-SimilarityTransformation = get_class("SimilarityTransformation", "ndx-spatial-transformation")
 Landmarks = get_class("Landmarks", "ndx-spatial-transformation")
 SpatialTransformationMetadata = get_class("SpatialTransformationMetadata", "ndx-spatial-transformation")
+
+# Get SimilarityTransformation and add custom method
+SimilarityTransformation = get_class("SimilarityTransformation", "ndx-spatial-transformation")
+
+
+def get_transform_matrix(self):
+    """
+    Construct and return a skimage.transform.SimilarityTransform for this object.
+
+    - Uses these class attributes from `SimilarityTransformation`:
+      - `scale` : float - uniform scale factor.
+      - `rotation_angle` : float - rotation in radians.
+      - `translation_vector` : sequence of length 2 - translation [tx, ty].
+
+    Returns
+    -------
+    skimage.transform.SimilarityTransform
+        A `SimilarityTransform` instance (2D) whose `params` attribute is the 3x3
+        homogeneous transformation matrix. The object also exposes `scale`,
+        `rotation`, and `translation` attributes corresponding to the inputs.
+
+    Example
+    -------
+    >>> transform = SimilarityTransformation(
+    ...     name="my_transform",
+    ...     rotation_angle=-1.5711312761753244,
+    ...     translation_vector=[10.0, 20.0],
+    ...     scale=0.5
+    ... )
+    >>> M = transform.get_transform_matrix()
+    >>> M.params  # 3x3 homogeneous matrix
+    array([...])
+    >>> M.scale
+    0.5
+    """
+    from skimage.transform import SimilarityTransform
+
+    similarity_transform = SimilarityTransform(
+        scale=self.scale,
+        rotation=self.rotation_angle,
+        translation=self.translation_vector,
+        dimensionality=2,
+    )
+
+    return similarity_transform
+
+
+# Attach the method to the SimilarityTransformation class
+SimilarityTransformation.get_transform_matrix = get_transform_matrix
 
 # TODO: Add all classes to __all__ to make them accessible at the package level
 __all__ = [
@@ -32,4 +77,4 @@ __all__ = [
 ]
 
 # Remove these functions/modules from the package
-del load_namespaces, get_class, files, __location_of_this_file, __spec_path
+del load_namespaces, get_class, files, get_transform_matrix, __location_of_this_file, __spec_path

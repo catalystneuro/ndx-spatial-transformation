@@ -63,7 +63,7 @@ nwbfile = NWBFile(
 )
 
 # Define transformation parameters
-rotation_angle = -1.5711312761753244  # radians (counter-clockwise)
+rotation_angle = -1.5711312761753244  # radians
 translation_vector = np.array([57.23, 615.26])
 scale_factor = 0.9755836358284588
 
@@ -75,17 +75,12 @@ similarity_transformation = SimilarityTransformation(
     scale=scale_factor,
 )
 
-# Define transformation matrix
-transform_matrix = np.array([
-    [-3.27e-04, 9.76e-01, 5.72e+01],
-    [-9.76e-01, -3.27e-04, 6.15e+02],
-    [0.00e+00, 0.00e+00, 1.00e+00]
-])
+# Get transformation matrix
+transform_matrix = similarity_transformation.get_transform_matrix()
 
 # Generate example images
 source_image_data = np.random.randint(0, 256, size=(512, 512), dtype=np.uint8)
-M = SimilarityTransform(transform_matrix)
-target_image_data = im_apply_transform(im=source_image_data, M=M)
+target_image_data = im_apply_transform(im=source_image_data, M=transform_matrix)
 
 # Wrap images in NWB containers
 source_image = GrayscaleImage(
