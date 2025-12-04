@@ -11,12 +11,11 @@ authors = [
 ]
 description = "An extension to store data on spatial transformation"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "BSD-3-Clause"
 classifiers = [
     # TODO: update these classifiers before release
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
