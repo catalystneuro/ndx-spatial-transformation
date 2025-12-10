@@ -11,39 +11,45 @@ from ndx_spatial_transformation import (
     SpatialTransformationMetadata,
 )
 
+ROTATION_MATRIX_2D = np.array(
+    [[-0.00032677112826650533, 0.9755835811025647], [-0.9755835811025648, -0.00032677112826617975]]
+)
+TRANSLATION_VECTOR_2D = [57.227564641852496, 615.2575908529723]
+SCALE = 0.9755836358284588
+
 
 class TestRigidTransformationConstructor(TestCase):
     """Unit tests for RigidTransformation constructor."""
 
     def setUp(self):
         """Set up example parameters for tests."""
-        self.rotation_angle = 1.5707963267948966
-        self.translation = np.array([10.0, 20.0])
+        self.rotation_matrix = ROTATION_MATRIX_2D
+        self.translation = TRANSLATION_VECTOR_2D
         self.center_of_rotation = np.array([0.0, 0.0])
 
     def test_constructor_basic(self):
-        """RigidTransformation can be constructed with rotation angle and translation vector."""
+        """RigidTransformation can be constructed with rotation matrix and translation vector."""
         rt = RigidTransformation(
             name="rigid_basic",
-            rotation_angle=self.rotation_angle,
+            rotation_matrix=self.rotation_matrix,
             translation_vector=self.translation,
         )
 
         self.assertEqual(rt.name, "rigid_basic")
-        self.assertEqual(rt.rotation_angle, self.rotation_angle)
+        np.testing.assert_array_equal(rt.rotation_matrix, self.rotation_matrix)
         np.testing.assert_array_equal(rt.translation_vector, self.translation)
 
     def test_constructor_with_center_of_rotation(self):
         """RigidTransformation can be constructed with optional center_of_rotation."""
         rt = RigidTransformation(
             name="rigid_with_center",
-            rotation_angle=self.rotation_angle,
+            rotation_matrix=self.rotation_matrix,
             translation_vector=self.translation,
             center_of_rotation=self.center_of_rotation,
         )
 
         self.assertEqual(rt.name, "rigid_with_center")
-        self.assertEqual(rt.rotation_angle, self.rotation_angle)
+        np.testing.assert_array_equal(rt.rotation_matrix, self.rotation_matrix)
         np.testing.assert_array_equal(rt.center_of_rotation, self.center_of_rotation)
 
 
@@ -52,22 +58,22 @@ class TestSimilarityTransformationConstructor(TestCase):
 
     def setUp(self):
         """Set up example parameters for tests."""
-        self.rotation_angle = 1.5707963267948966
-        self.translation = np.array([10.0, 20.0])
+        self.rotation_matrix = ROTATION_MATRIX_2D
+        self.translation = TRANSLATION_VECTOR_2D
+        self.scale = SCALE
         self.center_of_rotation = np.array([0.0, 0.0])
-        self.scale = 1.5
 
     def test_constructor_basic(self):
-        """SimilarityTransformation can be constructed with rotation, translation, and scale."""
+        """SimilarityTransformation can be constructed with rotation matrix, translation, and scale."""
         st = SimilarityTransformation(
             name="similarity_basic",
-            rotation_angle=self.rotation_angle,
+            rotation_matrix=self.rotation_matrix,
             translation_vector=self.translation,
             scale=self.scale,
         )
 
         self.assertEqual(st.name, "similarity_basic")
-        self.assertEqual(st.rotation_angle, self.rotation_angle)
+        np.testing.assert_array_equal(st.rotation_matrix, self.rotation_matrix)
         np.testing.assert_array_equal(st.translation_vector, self.translation)
         self.assertEqual(st.scale, self.scale)
 
@@ -75,7 +81,7 @@ class TestSimilarityTransformationConstructor(TestCase):
         """SimilarityTransformation inherits all RigidTransformation attributes."""
         st = SimilarityTransformation(
             name="similarity_with_center",
-            rotation_angle=self.rotation_angle,
+            rotation_matrix=self.rotation_matrix,
             translation_vector=self.translation,
             center_of_rotation=self.center_of_rotation,
             scale=self.scale,
@@ -84,58 +90,19 @@ class TestSimilarityTransformationConstructor(TestCase):
         np.testing.assert_array_equal(st.center_of_rotation, self.center_of_rotation)
         self.assertEqual(st.scale, self.scale)
 
-    def test_get_transform_matrix_values(self):
-        """SimilarityTransformation.get_transform_matrix should return an object with a 3x3 params matrix
-        and attributes reflecting the input scale, rotation, and translation.
-        """
-        tolerance = dict(rtol=1e-7, atol=1e-8)
-
-        st = SimilarityTransformation(
-            name="test_sim",
-            rotation_angle=self.rotation_angle,
-            translation_vector=self.translation,
-            scale=self.scale,
-        )
-
-        T = st.get_transform_matrix()
-
-        # The returned object should expose a 3x3 homogeneous matrix
-        assert hasattr(T, "params"), "Returned object must have 'params' attribute"
-        M = np.array(T.params)
-        assert M.shape == (3, 3)
-
-        # Expected homogeneous matrix for 2D similarity (scale * rotation) + translation
-        c = np.cos(self.rotation_angle)
-        s = np.sin(self.rotation_angle)
-        expected = np.array(
-            [
-                [self.scale * c, -self.scale * s, self.translation[0]],
-                [self.scale * s, self.scale * c, self.translation[1]],
-                [0.0, 0.0, 1.0],
-            ]
-        )
-
-        np.testing.assert_allclose(M, expected, **tolerance)
-        # The returned object should also expose scale, rotation, and translation attributes
-        # that match the inputs
-        assert hasattr(T, "scale")
-        assert hasattr(T, "rotation")
-        assert hasattr(T, "translation")
-
-        self.assertEqual(T.scale, self.scale)
-        np.testing.assert_allclose(T.rotation, self.rotation_angle, **tolerance)
-        np.testing.assert_allclose(np.array(T.translation), self.translation, **tolerance)
-
 
 class TestLandmarksConstructor(TestCase):
     """Unit tests for Landmarks constructor."""
 
     def setUp(self):
         """Set up example parameters for tests."""
+
+        self.rotation_matrix = ROTATION_MATRIX_2D
+        self.translation = TRANSLATION_VECTOR_2D
         self.source_coordinates = np.array([[0.0, 0.0], [5.0, 5.0]])
         self.target_coordinates = np.array([[10.0, 20.0], [15.0, 25.0]])
         self.center_of_rotation = np.array([0.0, 0.0])
-        self.scale = 1.5
+        self.scale = SCALE
 
     def test_constructor_basic(self):
         """Landmarks can be constructed with minimal required data."""
@@ -171,8 +138,8 @@ class TestLandmarksConstructor(TestCase):
         """Landmarks can be linked to a SpatialTransformation."""
         rt = RigidTransformation(
             name="rigid_for_landmarks",
-            rotation_angle=0.0,
-            translation_vector=np.array([1.0, 2.0]),
+            rotation_matrix=self.rotation_matrix,
+            translation_vector=self.translation,
         )
         lm = Landmarks(
             name="landmarks_linked",
@@ -291,8 +258,10 @@ class TestLandmarksConstructor(TestCase):
 
         rt = RigidTransformation(
             name="rigid_transform",
-            rotation_angle=np.pi / 4,
-            translation_vector=np.array([10.0, 20.0]),
+            rotation_matrix=np.array(
+                [[-0.00032677112826650533, 0.9755835811025647], [-0.9755835811025648, -0.00032677112826617975]]
+            ),
+            translation_vector=[57.227564641852496, 615.2575908529723],
         )
 
         source_img = GrayscaleImage(
@@ -336,14 +305,14 @@ class TestSpatialTransformationMetadataConstructor(TestCase):
         """Set up common test objects."""
         self.rt = RigidTransformation(
             name="rigid_1",
-            rotation_angle=0.0,
-            translation_vector=np.array([1.0, 2.0]),
+            rotation_matrix=ROTATION_MATRIX_2D,
+            translation_vector=TRANSLATION_VECTOR_2D,
         )
         self.st = SimilarityTransformation(
             name="similarity_1",
-            rotation_angle=0.0,
-            translation_vector=np.array([1.0, 2.0]),
-            scale=1.5,
+            rotation_matrix=ROTATION_MATRIX_2D,
+            translation_vector=TRANSLATION_VECTOR_2D,
+            scale=SCALE,
         )
         self.lm = Landmarks(name="landmarks_1", description="Test landmarks")
         self.lm.add_row(source_coordinates=np.array([0.0, 0.0]))
@@ -371,6 +340,9 @@ class TestSpatialTransformationMetadataConstructor(TestCase):
         self.assertEqual(len(meta.spatial_transformations), 2)
         self.assertIn("rigid_1", meta.spatial_transformations)
         self.assertIn("similarity_1", meta.spatial_transformations)
+        # Verify types
+        self.assertIsInstance(meta.spatial_transformations["rigid_1"], RigidTransformation)
+        self.assertIsInstance(meta.spatial_transformations["similarity_1"], SimilarityTransformation)
 
     def test_add_single_landmarks(self):
         """SpatialTransformationMetadata can hold a single landmark set."""
@@ -393,33 +365,6 @@ class TestSpatialTransformationMetadataConstructor(TestCase):
         self.assertEqual(len(meta.landmarks), 2)
         self.assertIn("landmarks_1", meta.landmarks)
         self.assertIn("landmarks_2", meta.landmarks)
-
-    def test_mixed_transformation_types(self):
-        """SpatialTransformationMetadata can store different transformation types together."""
-        meta = SpatialTransformationMetadata(name="mixed_meta")
-
-        rt = RigidTransformation(
-            name="rigid_transform",
-            rotation_angle=np.pi / 4,
-            translation_vector=np.array([10.0, 20.0]),
-        )
-        st = SimilarityTransformation(
-            name="similarity_transform",
-            rotation_angle=np.pi / 6,
-            translation_vector=np.array([5.0, 10.0]),
-            scale=2.0,
-        )
-
-        meta.add_spatial_transformations(spatial_transformations=rt)
-        meta.add_spatial_transformations(spatial_transformations=st)
-
-        # Verify we can retrieve them
-        self.assertEqual(meta.spatial_transformations["rigid_transform"].name, "rigid_transform")
-        self.assertEqual(meta.spatial_transformations["similarity_transform"].name, "similarity_transform")
-
-        # Verify types
-        self.assertIsInstance(meta.spatial_transformations["rigid_transform"], RigidTransformation)
-        self.assertIsInstance(meta.spatial_transformations["similarity_transform"], SimilarityTransformation)
 
     def test_complete_metadata_container(self):
         """SpatialTransformationMetadata can hold both transformations and landmarks."""

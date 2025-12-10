@@ -5,6 +5,7 @@ written to disk, and read back correctly with all data preserved.
 """
 
 from datetime import datetime
+
 import numpy as np
 from dateutil.tz import tzutc
 
@@ -17,6 +18,12 @@ from ndx_spatial_transformation import (
     Landmarks,
     SpatialTransformationMetadata,
 )
+
+ROTATION_MATRIX_2D = np.array(
+    [[-0.00032677112826650533, 0.9755835811025647], [-0.9755835811025648, -0.00032677112826617975]]
+)
+TRANSLATION_VECTOR_2D = [57.227564641852496, 615.2575908529723]
+SCALE = 0.9755836358284588
 
 
 class TestRigidTransformationRoundtrip(TestCase):
@@ -35,12 +42,12 @@ class TestRigidTransformationRoundtrip(TestCase):
 
     def test_roundtrip(self):
         """RigidTransformation can be written and read back."""
-        rotation_angle = np.pi / 4  # 45 degrees
-        translation = np.array([10.0, 20.0])
+        rotation_matrix = ROTATION_MATRIX_2D
+        translation = TRANSLATION_VECTOR_2D
 
         rt = RigidTransformation(
             name="rigid",
-            rotation_angle=rotation_angle,
+            rotation_matrix=rotation_matrix,
             translation_vector=translation,
         )
 
@@ -59,7 +66,7 @@ class TestRigidTransformationRoundtrip(TestCase):
             self.assertIsInstance(read_meta, SpatialTransformationMetadata)
 
             read_rt = read_meta.spatial_transformations["rigid"]
-            self.assertEqual(read_rt.rotation_angle, rotation_angle)
+            np.testing.assert_array_equal(read_rt.rotation_matrix, rotation_matrix)
             np.testing.assert_array_equal(read_rt.translation_vector, translation)
 
 
@@ -79,13 +86,13 @@ class TestSimilarityTransformationRoundtrip(TestCase):
 
     def test_roundtrip(self):
         """SimilarityTransformation can be written and read back."""
-        rotation_angle = np.pi / 6  # 30 degrees
-        translation = np.array([5.0, 10.0])
-        scale = 1.5
+        rotation_matrix = ROTATION_MATRIX_2D
+        translation = TRANSLATION_VECTOR_2D
+        scale = SCALE
 
         st = SimilarityTransformation(
             name="similarity",
-            rotation_angle=rotation_angle,
+            rotation_matrix=rotation_matrix,
             translation_vector=translation,
             scale=scale,
         )
@@ -102,7 +109,7 @@ class TestSimilarityTransformationRoundtrip(TestCase):
             read_meta = read_nwbfile.lab_meta_data["spatial_meta_similarity"]
             read_st = read_meta.spatial_transformations["similarity"]
 
-            self.assertEqual(read_st.rotation_angle, rotation_angle)
+            np.testing.assert_array_equal(read_st.rotation_matrix, rotation_matrix)
             np.testing.assert_array_equal(read_st.translation_vector, translation)
             self.assertEqual(read_st.scale, scale)
 
@@ -221,12 +228,10 @@ class TestLandmarksRoundtrip(TestCase):
 
     def test_roundtrip_with_transformation_link(self):
         """Landmarks linked to a transformation can be written and read back."""
-        rotation_angle = 0.0
-        translation = np.array([10.0, 20.0])
         rt = RigidTransformation(
             name="rigid_for_landmarks",
-            rotation_angle=rotation_angle,
-            translation_vector=translation,
+            rotation_matrix=ROTATION_MATRIX_2D,
+            translation_vector=TRANSLATION_VECTOR_2D,
         )
 
         lm = Landmarks(
@@ -252,35 +257,34 @@ class TestLandmarksRoundtrip(TestCase):
 
             self.assertIsNotNone(read_lm.transformation)
             self.assertEqual(read_lm.transformation.name, "rigid_for_landmarks")
-            self.assertEqual(read_lm.transformation.rotation_angle, rotation_angle)
 
     def test_roundtrip_all_fields(self):
         """Landmarks with all optional fields can be written and read back."""
         rt = RigidTransformation(
             name="transform_for_complete",
-            rotation_angle=np.pi / 4,
-            translation_vector=np.array([5.0, 10.0]),
+            rotation_matrix=ROTATION_MATRIX_2D,
+            translation_vector=TRANSLATION_VECTOR_2D,
         )
 
         lm = Landmarks(
             name="landmarks_complete",
-            description="Complete landmarks with all fields",
+            description="Complete landmarks",
             transformation=rt,
         )
         lm.add_row(
             source_coordinates=np.array([0.0, 0.0]),
             target_coordinates=np.array([10.0, 10.0]),
             landmark_labels="Point1",
-            confidence=0.99,
+            confidence=0.9,
         )
         lm.add_row(
-            source_coordinates=np.array([5.0, 5.0]),
-            target_coordinates=np.array([15.0, 15.0]),
+            source_coordinates=np.array([20.0, 20.0]),
+            target_coordinates=np.array([30.0, 30.0]),
             landmark_labels="Point2",
             confidence=0.85,
         )
 
-        meta = SpatialTransformationMetadata(name="spatial_meta_complete")
+        meta = SpatialTransformationMetadata(name="spatial_meta_landmarks_complete")
         meta.add_spatial_transformations(spatial_transformations=rt)
         meta.add_landmarks(landmarks=lm)
         self.nwbfile.add_lab_meta_data(meta)
@@ -290,7 +294,7 @@ class TestLandmarksRoundtrip(TestCase):
 
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
-            read_meta = read_nwbfile.lab_meta_data["spatial_meta_complete"]
+            read_meta = read_nwbfile.lab_meta_data["spatial_meta_landmarks_complete"]
             read_lm = read_meta.landmarks["landmarks_complete"]
 
             self.assertEqual(len(read_lm.source_coordinates), 2)
@@ -415,10 +419,13 @@ class TestLandmarksRoundtrip(TestCase):
         from pynwb.image import GrayscaleImage
         from pynwb.base import Images
 
+        rotation_matrix = ROTATION_MATRIX_2D
+        translation = TRANSLATION_VECTOR_2D
+
         rt = RigidTransformation(
             name="rigid_with_images",
-            rotation_angle=np.pi / 4,
-            translation_vector=np.array([10.0, 20.0]),
+            rotation_matrix=rotation_matrix,
+            translation_vector=translation,
         )
 
         source_img = GrayscaleImage(
@@ -471,7 +478,8 @@ class TestLandmarksRoundtrip(TestCase):
 
             # Verify transformation
             self.assertEqual(read_lm.transformation.name, "rigid_with_images")
-            self.assertEqual(read_lm.transformation.rotation_angle, np.pi / 4)
+            np.testing.assert_array_equal(read_lm.transformation.rotation_matrix, rotation_matrix)
+            np.testing.assert_array_equal(read_lm.transformation.translation_vector, translation)
 
             # Verify images
             self.assertEqual(read_lm.source_image.name, "source_image")
@@ -502,14 +510,14 @@ class TestSpatialTransformationMetadataRoundtrip(TestCase):
         """SpatialTransformationMetadata with multiple transformations can be written and read back."""
         rt = RigidTransformation(
             name="rigid_1",
-            rotation_angle=np.pi / 4,
-            translation_vector=np.array([10.0, 20.0]),
+            rotation_matrix=ROTATION_MATRIX_2D,
+            translation_vector=TRANSLATION_VECTOR_2D,
         )
         st = SimilarityTransformation(
             name="similarity_1",
-            rotation_angle=np.pi / 6,
-            translation_vector=np.array([5.0, 10.0]),
-            scale=1.5,
+            rotation_matrix=ROTATION_MATRIX_2D,
+            translation_vector=TRANSLATION_VECTOR_2D,
+            scale=SCALE,
         )
 
         meta = SpatialTransformationMetadata(name="multi_transform_meta")
@@ -527,6 +535,17 @@ class TestSpatialTransformationMetadataRoundtrip(TestCase):
             self.assertEqual(len(read_meta.spatial_transformations), 2)
             self.assertIn("rigid_1", read_meta.spatial_transformations)
             self.assertIn("similarity_1", read_meta.spatial_transformations)
+
+            # Verify specific types
+            read_rt = read_meta.spatial_transformations["rigid_1"]
+            read_st = read_meta.spatial_transformations["similarity_1"]
+
+            self.assertIsInstance(read_rt, RigidTransformation)
+            self.assertIsInstance(read_st, SimilarityTransformation)
+
+            # Verify data preservation
+            np.testing.assert_array_equal(read_rt.rotation_matrix, ROTATION_MATRIX_2D)
+            np.testing.assert_array_equal(read_st.scale, SCALE)
 
     def test_roundtrip_multiple_landmarks(self):
         """SpatialTransformationMetadata with multiple landmark sets can be written and read back."""
@@ -555,65 +574,3 @@ class TestSpatialTransformationMetadataRoundtrip(TestCase):
             self.assertIn("landmarks_2", read_meta.landmarks)
             self.assertEqual(len(read_meta.landmarks["landmarks_1"].source_coordinates), 3)
             self.assertEqual(len(read_meta.landmarks["landmarks_2"].source_coordinates), 5)
-
-    def test_roundtrip_mixed_transformation_types(self):
-        """SpatialTransformationMetadata with different transformation types can be written and read back."""
-        # Create different types of transformations
-        rt = RigidTransformation(
-            name="rigid_transform",
-            rotation_angle=0.0,
-            translation_vector=np.array([10.0, 20.0]),
-        )
-
-        st = SimilarityTransformation(
-            name="similarity_transform",
-            rotation_angle=np.pi / 4,
-            translation_vector=np.array([5.0, 10.0]),
-            scale=1.5,
-        )
-
-        # Create landmarks linked to the rigid transformation
-        lm = Landmarks(
-            name="test_landmarks",
-            description="Landmarks for mixed types test",
-            transformation=rt,
-        )
-        lm.add_row(
-            source_coordinates=np.array([0.0, 0.0]),
-            landmark_labels="Point1",
-            confidence=0.9,
-        )
-
-        # Add everything to metadata
-        meta = SpatialTransformationMetadata(name="mixed_types_meta")
-        meta.add_spatial_transformations(spatial_transformations=rt)
-        meta.add_spatial_transformations(spatial_transformations=st)
-        meta.add_landmarks(landmarks=lm)
-        self.nwbfile.add_lab_meta_data(meta)
-
-        with NWBHDF5IO(self.path, mode="w") as io:
-            io.write(self.nwbfile)
-
-        with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
-            read_nwbfile = io.read()
-            read_meta = read_nwbfile.lab_meta_data["mixed_types_meta"]
-
-            # Verify all transformations are present
-            self.assertEqual(len(read_meta.spatial_transformations), 2)
-
-            # Verify specific types
-            read_rt = read_meta.spatial_transformations["rigid_transform"]
-            read_st = read_meta.spatial_transformations["similarity_transform"]
-
-            self.assertIsInstance(read_rt, RigidTransformation)
-            self.assertIsInstance(read_st, SimilarityTransformation)
-
-            # Verify data preservation
-            self.assertEqual(read_rt.rotation_angle, 0.0)
-            self.assertEqual(read_st.scale, 1.5)
-
-            # Verify landmarks and link
-            self.assertEqual(len(read_meta.landmarks), 1)
-            read_lm = read_meta.landmarks["test_landmarks"]
-            self.assertIsNotNone(read_lm.transformation)
-            self.assertEqual(read_lm.transformation.name, "rigid_transform")

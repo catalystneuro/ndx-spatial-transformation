@@ -13,9 +13,15 @@ groups:
       Rigid body transformation preserving distances and angles.
       For 2D: 3 DOF (1 rotation + 2 translations)
     datasets:
-      - name: rotation_angle
+      - name: rotation_matrix
         dtype: float
-        doc: "Rotation angle in radians. Single value for 2D rotation. Positive values indicate counter-clockwise rotation."
+        doc: "Rotation matrix. Shape: (2, 2) for 2D"
+        shape:
+          - 2
+          - 2
+        dims:
+          - rows
+          - columns
 
       - name: translation_vector
         dtype: float
