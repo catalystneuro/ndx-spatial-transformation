@@ -11,12 +11,11 @@ authors = [
 ]
 description = "An extension to store data on spatial transformation"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "BSD-3-Clause"
 classifiers = [
     # TODO: update these classifiers before release
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -50,12 +49,17 @@ docs = [
     "hdmf-docutils>=0.4.7",
 ]
 
+# Optional dependencies for using wfield image transformation function
+wfield = [
+  "wfield >= 0.6.0"
+]
+
 dev = [
     "black>=24.4.2",
     "codespell>=2.3.0",
     "pre-commit>=3.5.0",
     "ruff>=0.4.10",
-    "ndx-spatial-transformation[docs,test]",
+    "ndx-spatial-transformation[docs,test,wfield]",
 ]
 
 # minimum requirements of project dependencies for testing (see .github/workflows/run_all_tests.yml)

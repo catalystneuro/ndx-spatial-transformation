@@ -12,10 +12,7 @@ if not __spec_path.exists():
 # Load the namespace
 load_namespaces(str(__spec_path))
 
-# TODO: Define your classes here to make them accessible at the package level.
-# Either have PyNWB generate a class from the spec using `get_class` as shown
-# below or write a custom class and register it using the class decorator
-# `@register_class("TetrodeSeries", "ndx-spatial-transformation")`
+# Get base classes
 SpatialTransformation = get_class("SpatialTransformation", "ndx-spatial-transformation")
 RigidTransformation = get_class("RigidTransformation", "ndx-spatial-transformation")
 SimilarityTransformation = get_class("SimilarityTransformation", "ndx-spatial-transformation")
@@ -23,7 +20,6 @@ AffineTransformation = get_class("AffineTransformation", "ndx-spatial-transforma
 Landmarks = get_class("Landmarks", "ndx-spatial-transformation")
 SpatialTransformationMetadata = get_class("SpatialTransformationMetadata", "ndx-spatial-transformation")
 
-# TODO: Add all classes to __all__ to make them accessible at the package level
 __all__ = [
     "SpatialTransformation",
     "RigidTransformation",
