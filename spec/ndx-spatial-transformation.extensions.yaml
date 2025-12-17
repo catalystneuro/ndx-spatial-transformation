@@ -6,6 +6,26 @@ groups:
       Base class for spatial transformations used in image registration and coordinate mapping.
       Supports transformations between different coordinate spaces (e.g., image space to atlas space).
 
+    # Affine transformation (rotation + translation + scaling + shearing)
+  - neurodata_type_def: AffineTransformation
+    neurodata_type_inc: SpatialTransformation
+    doc: |
+      Affine transformation preserving parallel lines.
+      For 2D: 6 DOF (rotation, translation, scaling, shearing)
+    datasets:
+      - name: affine_matrix
+        dtype: float
+        doc: |
+          Affine transformation matrix in homogeneous coordinates.
+          Shape: (3, 3) for 2D.
+          Last row is [0, 0, ..., 1] for homogeneous representation.
+        shape:
+          - 3
+          - 3
+        dims:
+          - rows
+          - cols
+
   # Rigid transformation (rotation + translation)
   - neurodata_type_def: RigidTransformation
     neurodata_type_inc: SpatialTransformation

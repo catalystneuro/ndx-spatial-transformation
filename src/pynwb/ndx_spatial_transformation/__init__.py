@@ -16,6 +16,7 @@ load_namespaces(str(__spec_path))
 SpatialTransformation = get_class("SpatialTransformation", "ndx-spatial-transformation")
 RigidTransformation = get_class("RigidTransformation", "ndx-spatial-transformation")
 SimilarityTransformation = get_class("SimilarityTransformation", "ndx-spatial-transformation")
+AffineTransformation = get_class("AffineTransformation", "ndx-spatial-transformation")
 Landmarks = get_class("Landmarks", "ndx-spatial-transformation")
 SpatialTransformationMetadata = get_class("SpatialTransformationMetadata", "ndx-spatial-transformation")
 
