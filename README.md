@@ -50,7 +50,7 @@ from skimage.transform import SimilarityTransform
 from wfield import im_apply_transform
 
 from ndx_spatial_transformation import (
-    SimilarityTransformation,
+    AffineTransformation,
     SpatialTransformationMetadata,
     Landmarks,
 )
@@ -62,22 +62,24 @@ nwbfile = NWBFile(
     session_start_time=datetime(2024, 1, 1, tzinfo=tzutc()),
 )
 
-# Define transformation parameters
-rotation_matrix = np.array([[-0.00032677112826650533, 0.9755835811025647], [-0.9755835811025648, -0.00032677112826617975]])
-translation_vector =  [57.227564641852496, 615.2575908529723]
-scale_factor = 0.9755836358284588
+# Define transformation matrix
+transform = np.array(
+    [
+        [-0.00032677112826650533, 0.9755835811025647, 57.227564641852496],
+        [-0.9755835811025648, -0.00032677112826617975, 615.2575908529723],
+        [0.0, 0.0, 1.0],
+    ]
+)
 
-# Create similarity transformation object
-similarity_transformation = SimilarityTransformation(
-    name="SimilarityTransformation",
-    rotation_matrix=rotation_matrix,
-    translation_vector=translation_vector,
-    scale=scale_factor,
+# Create affine transformation object
+spatial_transformation = AffineTransformation(
+    name="AffineTransformation",
+    affine_matrix=transform,
 )
 
 # Generate example images
 source_image_data = np.random.randint(0, 256, size=(512, 512), dtype=np.uint8)
-target_image_data = im_apply_transform(im=source_image_data, M=SimilarityTransform(rotation_matrix))
+target_image_data = im_apply_transform(im=source_image_data, M=SimilarityTransform(transform))
 
 # Wrap images in NWB containers
 source_image = GrayscaleImage(
@@ -141,7 +143,7 @@ spatial_metadata = SpatialTransformationMetadata(
     name="SpatialTransformationMetadata"
 )
 spatial_metadata.add_spatial_transformations(
-    spatial_transformations=similarity_transformation
+    spatial_transformations=spatial_transformation
 )
 spatial_metadata.add_landmarks(landmarks=landmarks_table)
 nwbfile.add_lab_meta_data(spatial_metadata)
