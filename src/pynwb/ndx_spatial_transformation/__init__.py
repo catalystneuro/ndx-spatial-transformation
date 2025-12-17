@@ -20,5 +20,14 @@ AffineTransformation = get_class("AffineTransformation", "ndx-spatial-transforma
 Landmarks = get_class("Landmarks", "ndx-spatial-transformation")
 SpatialTransformationMetadata = get_class("SpatialTransformationMetadata", "ndx-spatial-transformation")
 
+__all__ = [
+    "SpatialTransformation",
+    "RigidTransformation",
+    "SimilarityTransformation",
+    "AffineTransformation",
+    "Landmarks",
+    "SpatialTransformationMetadata",
+]
+
 # Remove these functions/modules from the package
 del load_namespaces, get_class, files, __location_of_this_file, __spec_path
