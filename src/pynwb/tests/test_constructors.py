@@ -7,6 +7,7 @@ from pynwb.testing import TestCase
 from ndx_spatial_transformation import (
     RigidTransformation,
     SimilarityTransformation,
+    AffineTransformation,
     Landmarks,
     SpatialTransformationMetadata,
 )
@@ -16,6 +17,13 @@ ROTATION_MATRIX_2D = np.array(
 )
 TRANSLATION_VECTOR_2D = [57.227564641852496, 615.2575908529723]
 SCALE = 0.9755836358284588
+AFFINE_MATRIX_2D = np.array(
+    [
+        [-0.00032677112826650533, 0.9755835811025647, 57.227564641852496],
+        [-0.9755835811025648, -0.00032677112826617975, 615.2575908529723],
+        [0.0, 0.0, 1.0],
+    ]
+)
 
 
 class TestRigidTransformationConstructor(TestCase):
@@ -89,6 +97,24 @@ class TestSimilarityTransformationConstructor(TestCase):
 
         np.testing.assert_array_equal(st.center_of_rotation, self.center_of_rotation)
         self.assertEqual(st.scale, self.scale)
+
+
+class TestAffineTransformationConstructor(TestCase):
+    """Unit tests for AffineTransformation constructor."""
+
+    def setUp(self):
+        """Set up example parameters for tests."""
+        self.affine_matrix = AFFINE_MATRIX_2D
+
+    def test_constructor_basic(self):
+        """AffineTransformation can be constructed with an affine matrix."""
+        at = AffineTransformation(
+            name="affine_basic",
+            affine_matrix=self.affine_matrix,
+        )
+
+        self.assertEqual(at.name, "affine_basic")
+        np.testing.assert_array_equal(at.affine_matrix, self.affine_matrix)
 
 
 class TestLandmarksConstructor(TestCase):

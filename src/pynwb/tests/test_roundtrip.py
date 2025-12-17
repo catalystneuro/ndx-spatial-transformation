@@ -15,6 +15,7 @@ from pynwb.testing import TestCase, remove_test_file
 from ndx_spatial_transformation import (
     RigidTransformation,
     SimilarityTransformation,
+    AffineTransformation,
     Landmarks,
     SpatialTransformationMetadata,
 )
@@ -24,6 +25,13 @@ ROTATION_MATRIX_2D = np.array(
 )
 TRANSLATION_VECTOR_2D = [57.227564641852496, 615.2575908529723]
 SCALE = 0.9755836358284588
+AFFINE_MATRIX_2D = np.array(
+    [
+        [-0.00032677112826650533, 0.9755835811025647, 57.227564641852496],
+        [-0.9755835811025648, -0.00032677112826617975, 615.2575908529723],
+        [0.0, 0.0, 1.0],
+    ]
+)
 
 
 class TestRigidTransformationRoundtrip(TestCase):
@@ -112,6 +120,46 @@ class TestSimilarityTransformationRoundtrip(TestCase):
             np.testing.assert_array_equal(read_st.rotation_matrix, rotation_matrix)
             np.testing.assert_array_equal(read_st.translation_vector, translation)
             self.assertEqual(read_st.scale, scale)
+
+
+class TestAffineTransformationRoundtrip(TestCase):
+    """Roundtrip tests for AffineTransformation in an NWBFile."""
+
+    def setUp(self):
+        self.nwbfile = NWBFile(
+            session_description="test session for affine transformation",
+            identifier="affine-test",
+            session_start_time=datetime(2024, 1, 1, tzinfo=tzutc()),
+        )
+        self.path = "test_affine_transformation_roundtrip.nwb"
+
+    def tearDown(self):
+        remove_test_file(self.path)
+
+    def test_roundtrip(self):
+        """AffineTransformation can be written and read back."""
+        affine_matrix = AFFINE_MATRIX_2D
+
+        at = AffineTransformation(
+            name="affine",
+            affine_matrix=affine_matrix,
+        )
+
+        meta = SpatialTransformationMetadata(name="spatial_meta_affine")
+        meta.add_spatial_transformations(spatial_transformations=at)
+        self.nwbfile.add_lab_meta_data(meta)
+
+        with NWBHDF5IO(self.path, mode="w") as io:
+            io.write(self.nwbfile)
+
+        with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
+            read_nwbfile = io.read()
+            read_meta = read_nwbfile.lab_meta_data["spatial_meta_affine"]
+            self.assertIsInstance(read_meta, SpatialTransformationMetadata)
+
+            read_at = read_meta.spatial_transformations["affine"]
+            self.assertIsInstance(read_at, AffineTransformation)
+            np.testing.assert_array_equal(read_at.affine_matrix, affine_matrix)
 
 
 class TestLandmarksRoundtrip(TestCase):
