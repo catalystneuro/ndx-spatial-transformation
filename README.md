@@ -104,15 +104,15 @@ nwbfile.add_acquisition(images)
 
 # Define anatomical landmarks used for alignment
 landmarks_definitions = {
-    "source_coordinates": {
+    "source": {
         "x": [137.337774, 150.764796, 140.903437, 493.558386],
         "y": [381.428925, 302.164284, 226.593808, 301.863883],
-        "name": ["OB_left","OB_center","OB_right", "RSP_base"],
+        "name": ["OB_left", "OB_center", "OB_right", "RSP_base"],
     },
-    "target_coordinates":{
+    "target": {
         "x": [219.484536, 320.000000, 420.515464, 320.000000],
         "y": [92.164948, 92.164948, 92.164948, 434.948454],
-        "name": ["OB_left","OB_center","OB_right", "RSP_base"],
+        "name": ["OB_left", "OB_center", "OB_right", "RSP_base"],
     },
 }
 
@@ -127,15 +127,11 @@ landmarks_table = Landmarks(
 # Populate landmarks table
 for i in range(4):
     landmarks_table.add_row(
-        source_coordinates=[
-            landmarks_definitions["source_coordinates"]["x"][i],
-            landmarks_definitions["source_coordinates"]["y"][i],
-        ],
-        target_coordinates=[
-            landmarks_definitions["target_coordinates"]["x"][i],
-            landmarks_definitions["target_coordinates"]["y"][i],
-        ],
-        landmark_labels=landmarks_definitions["source_coordinates"]["name"][i],
+        source_x=landmarks_definitions["source"]["x"][i],
+        source_y=landmarks_definitions["source"]["y"][i],
+        target_x=landmarks_definitions["target"]["x"][i],
+        target_y=landmarks_definitions["target"]["y"][i],
+        landmark_labels=landmarks_definitions["source"]["name"][i],
     )
 
 # Add metadata to NWB file
