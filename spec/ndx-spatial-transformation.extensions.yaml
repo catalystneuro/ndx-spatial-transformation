@@ -75,26 +75,26 @@ groups:
     neurodata_type_inc: DynamicTable
     doc: |
       Spatial landmarks annotated on an image with their pixel coordinates in both
-      source and target spaces, along with the associated spatial transformation.
+      source and transformed spaces.
     links:
       - target_type: SpatialTransformation
         quantity: "?"
-        doc: "The spatial transformation mapping source to target coordinates."
+        doc: "The spatial transformation mapping source to transformed coordinates."
         name: transformation
 
       - target_type: Image
         quantity: "?"
-        doc: "The source image associated with the landmarks."
+        doc: "The source image associated with the landmarks (i.e., the moving/subject image)."
         name: source_image
 
       - target_type: Image
         quantity: "?"
-        doc: "The target/registered image (optional)."
-        name: target_image
+        doc: "The output image (optional). This is the transformed result of applying the spatial transformation to the source image."
+        name: output_image
 
       - target_type: Image
         quantity: "?"
-        doc: "The reference projection image (optional)."
+        doc: "The reference projection image (optional). This typically represents a fixed/template view used for alignment from an atlas."
         name: reference_projection_image
 
     datasets:
@@ -108,16 +108,16 @@ groups:
         dtype: float
         doc: "Y coordinate of each landmark in the source space (pixels)."
 
-      - name: target_x
+      - name: output_x
         neurodata_type_inc: VectorData
         dtype: float
-        doc: "X coordinate of each landmark in the target/registered space (pixels)."
+        doc: "X coordinate of each landmark in the output space (pixels). This is the transformed result of applying the spatial transformation to the source coordinates."
         quantity: "?" # optional dataset
 
-      - name: target_y
+      - name: output_y
         neurodata_type_inc: VectorData
         dtype: float
-        doc: "Y coordinate of each landmark in the target/registered space (pixels)."
+        doc: "Y coordinate of each landmark in the output space (pixels). This is the transformed result of applying the spatial transformation to the source coordinates."
         quantity: "?" # optional dataset
 
       - name: reference_x
