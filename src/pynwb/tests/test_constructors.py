@@ -117,7 +117,7 @@ class TestAffineTransformationConstructor(TestCase):
         np.testing.assert_array_equal(at.affine_matrix, self.affine_matrix)
 
 
-class TestLandmarksConstructor(TestCase):
+class TestLandmarksConstructors(TestCase):
     """Unit tests for Landmarks constructor."""
 
     def setUp(self):
@@ -127,8 +127,12 @@ class TestLandmarksConstructor(TestCase):
         self.translation = TRANSLATION_VECTOR_2D
         self.source_coordinates = np.array([[0.0, 0.0], [5.0, 5.0]])
         self.target_coordinates = np.array([[10.0, 20.0], [15.0, 25.0]])
-        self.center_of_rotation = np.array([0.0, 0.0])
-        self.scale = SCALE
+
+        # Convenience split columns for the updated schema
+        self.source_x = self.source_coordinates[:, 0]
+        self.source_y = self.source_coordinates[:, 1]
+        self.target_x = self.target_coordinates[:, 0]
+        self.target_y = self.target_coordinates[:, 1]
 
     def test_constructor_basic(self):
         """Landmarks can be constructed with minimal required data."""
@@ -137,28 +141,42 @@ class TestLandmarksConstructor(TestCase):
             description="Basic landmarks test",
         )
         for coord in self.source_coordinates:
-            lm.add_row(source_coordinates=coord)
+            lm.add_row(source_x=float(coord[0]), source_y=float(coord[1]))
 
         self.assertEqual(lm.name, "landmarks_basic")
-        self.assertEqual(len(lm.source_coordinates), len(self.source_coordinates))
-        np.testing.assert_array_equal(lm.source_coordinates[0], self.source_coordinates[0])
+        self.assertEqual(len(lm.source_x), len(self.source_coordinates))
+        np.testing.assert_array_equal(lm.source_x[:], self.source_x)
+        np.testing.assert_array_equal(lm.source_y[:], self.source_y)
+
+    def test_constructor_with_source_coordinates(self):
+        """Landmarks can include source coordinates for unregistered landmarks."""
+        lm = Landmarks(name="landmarks", description="Landmarks with source coordinates")
+
+        for coord in self.source_coordinates:
+            lm.add_row(source_x=float(coord[0]), source_y=float(coord[1]))
+
+        self.assertEqual(len(lm.source_x), len(self.source_coordinates))
+        np.testing.assert_array_equal(lm.source_x[:], self.source_x)
+        np.testing.assert_array_equal(lm.source_y[:], self.source_y)
 
     def test_constructor_with_target_coordinates(self):
-        """Landmarks can include target_coordinates for registered landmarks."""
-        lm = Landmarks(
-            name="landmarks_with_target",
-            description="Landmarks with target coordinates",
-        )
+        """Landmarks can include target coordinates for registered landmarks."""
+        lm = Landmarks(name="landmarks", description="Landmarks with target coordinates")
+
         for source_coord, target_coord in zip(self.source_coordinates, self.target_coordinates):
             lm.add_row(
-                source_coordinates=source_coord,
-                target_coordinates=target_coord,
+                source_x=float(source_coord[0]),
+                source_y=float(source_coord[1]),
+                target_x=float(target_coord[0]),
+                target_y=float(target_coord[1]),
             )
 
-        self.assertEqual(len(lm.source_coordinates), len(self.source_coordinates))
-        np.testing.assert_array_equal(lm.source_coordinates[1], self.source_coordinates[1])
-        self.assertEqual(len(lm.target_coordinates), len(self.target_coordinates))
-        np.testing.assert_array_equal(lm.target_coordinates[1], self.target_coordinates[1])
+        self.assertEqual(len(lm.source_x), len(self.source_coordinates))
+        np.testing.assert_array_equal(lm.source_x[:], self.source_x)
+        np.testing.assert_array_equal(lm.source_y[:], self.source_y)
+        self.assertEqual(len(lm.target_x), len(self.target_coordinates))
+        np.testing.assert_array_equal(lm.target_x[:], self.target_x)
+        np.testing.assert_array_equal(lm.target_y[:], self.target_y)
 
     def test_constructor_with_transformation_link(self):
         """Landmarks can be linked to a SpatialTransformation."""
@@ -172,7 +190,7 @@ class TestLandmarksConstructor(TestCase):
             description="Landmarks with transformation link",
             transformation=rt,
         )
-        lm.add_row(source_coordinates=self.source_coordinates)
+        lm.add_row(source_x=self.source_x, source_y=self.source_y)
 
         self.assertIsNotNone(lm.transformation)
         self.assertEqual(lm.transformation.name, "rigid_for_landmarks")
@@ -184,12 +202,14 @@ class TestLandmarksConstructor(TestCase):
             description="Detailed landmarks",
         )
         lm.add_row(
-            source_coordinates=np.array([0.0, 0.0]),
+            source_x=0.0,
+            source_y=0.0,
             landmark_labels="Bregma",
             confidence=0.95,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
+            source_x=10.0,
+            source_y=20.0,
             landmark_labels="Lambda",
             confidence=0.87,
         )
@@ -215,8 +235,8 @@ class TestLandmarksConstructor(TestCase):
             description="Landmarks with source image link",
             source_image=source_img,
         )
-        lm.add_row(source_coordinates=np.array([10.0, 20.0]))
-        lm.add_row(source_coordinates=np.array([30.0, 40.0]))
+        lm.add_row(source_x=10.0, source_y=20.0)
+        lm.add_row(source_x=30.0, source_y=40.0)
 
         self.assertIsNotNone(lm.source_image)
         self.assertEqual(lm.source_image.name, "source_image")
@@ -237,7 +257,7 @@ class TestLandmarksConstructor(TestCase):
             description="Landmarks with target image link",
             target_image=target_img,
         )
-        lm.add_row(source_coordinates=np.array([10.0, 20.0]))
+        lm.add_row(source_x=10.0, source_y=20.0)
 
         self.assertIsNotNone(lm.target_image)
         self.assertEqual(lm.target_image.name, "target_image")
@@ -265,12 +285,16 @@ class TestLandmarksConstructor(TestCase):
             target_image=target_img,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
-            target_coordinates=np.array([15.0, 25.0]),
+            source_x=10.0,
+            source_y=20.0,
+            target_x=15.0,
+            target_y=25.0,
         )
         lm.add_row(
-            source_coordinates=np.array([50.0, 60.0]),
-            target_coordinates=np.array([55.0, 65.0]),
+            source_x=50.0,
+            source_y=60.0,
+            target_x=55.0,
+            target_y=65.0,
         )
 
         self.assertIsNotNone(lm.source_image)
@@ -310,8 +334,10 @@ class TestLandmarksConstructor(TestCase):
             target_image=target_img,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
-            target_coordinates=np.array([15.0, 25.0]),
+            source_x=10.0,
+            source_y=20.0,
+            target_x=15.0,
+            target_y=25.0,
             landmark_labels="Point1",
             confidence=0.95,
         )
@@ -341,7 +367,7 @@ class TestSpatialTransformationMetadataConstructor(TestCase):
             scale=SCALE,
         )
         self.lm = Landmarks(name="landmarks_1", description="Test landmarks")
-        self.lm.add_row(source_coordinates=np.array([0.0, 0.0]))
+        self.lm.add_row(source_x=0.0, source_y=0.0)
 
     def test_constructor_empty(self):
         """SpatialTransformationMetadata can be constructed empty."""
@@ -383,7 +409,7 @@ class TestSpatialTransformationMetadataConstructor(TestCase):
         meta = SpatialTransformationMetadata(name="multi_landmarks_meta")
 
         lm2 = Landmarks(name="landmarks_2", description="Second set")
-        lm2.add_row(source_coordinates=np.array([1.0, 1.0]))
+        lm2.add_row(source_x=1.0, source_y=1.0)
 
         meta.add_landmarks(landmarks=self.lm)
         meta.add_landmarks(landmarks=lm2)
@@ -401,7 +427,7 @@ class TestSpatialTransformationMetadataConstructor(TestCase):
             description="Test landmarks",
             transformation=self.rt,
         )
-        lm.add_row(source_coordinates=np.array([0.0, 0.0]))
+        lm.add_row(source_x=0.0, source_y=0.0)
 
         meta.add_spatial_transformations(spatial_transformations=self.rt)
         meta.add_landmarks(landmarks=lm)

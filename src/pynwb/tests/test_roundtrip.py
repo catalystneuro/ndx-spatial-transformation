@@ -177,14 +177,14 @@ class TestLandmarksRoundtrip(TestCase):
         remove_test_file(self.path)
 
     def test_roundtrip_basic(self):
-        """Landmarks with source_coordinates can be written and read back."""
+        """Landmarks with source coordinates can be written and read back."""
         lm = Landmarks(
             name="landmarks",
             description="Basic landmarks for testing",
         )
-        lm.add_row(source_coordinates=np.array([0.0, 0.0]))
-        lm.add_row(source_coordinates=np.array([10.0, 10.0]))
-        lm.add_row(source_coordinates=np.array([20.0, 20.0]))
+        lm.add_row(source_x=0.0, source_y=0.0)
+        lm.add_row(source_x=10.0, source_y=10.0)
+        lm.add_row(source_x=20.0, source_y=20.0)
 
         meta = SpatialTransformationMetadata(name="spatial_meta_landmarks")
         meta.add_landmarks(landmarks=lm)
@@ -198,23 +198,27 @@ class TestLandmarksRoundtrip(TestCase):
             read_meta = read_nwbfile.lab_meta_data["spatial_meta_landmarks"]
             read_lm = read_meta.landmarks["landmarks"]
 
-            self.assertEqual(len(read_lm.source_coordinates), 3)
-            np.testing.assert_array_equal(read_lm.source_coordinates[0], np.array([0.0, 0.0]))
-            np.testing.assert_array_equal(read_lm.source_coordinates[1], np.array([10.0, 10.0]))
+            self.assertEqual(len(read_lm.source_x), 3)
+            np.testing.assert_array_equal(read_lm.source_x[:], np.array([0.0, 10.0, 20.0]))
+            np.testing.assert_array_equal(read_lm.source_y[:], np.array([0.0, 10.0, 20.0]))
 
     def test_roundtrip_with_target_coordinates(self):
-        """Landmarks with target_coordinates can be written and read back."""
+        """Landmarks with target coordinates can be written and read back."""
         lm = Landmarks(
             name="landmarks_with_target",
             description="Landmarks with target coordinates",
         )
         lm.add_row(
-            source_coordinates=np.array([0.0, 0.0]),
-            target_coordinates=np.array([100.0, 100.0]),
+            source_x=0.0,
+            source_y=0.0,
+            target_x=100.0,
+            target_y=100.0,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
-            target_coordinates=np.array([110.0, 120.0]),
+            source_x=10.0,
+            source_y=20.0,
+            target_x=110.0,
+            target_y=120.0,
         )
 
         meta = SpatialTransformationMetadata(name="spatial_meta_landmarks_target")
@@ -229,10 +233,12 @@ class TestLandmarksRoundtrip(TestCase):
             read_meta = read_nwbfile.lab_meta_data["spatial_meta_landmarks_target"]
             read_lm = read_meta.landmarks["landmarks_with_target"]
 
-            self.assertEqual(len(read_lm.source_coordinates), 2)
-            self.assertEqual(len(read_lm.target_coordinates), 2)
-            np.testing.assert_array_equal(read_lm.source_coordinates[0], np.array([0.0, 0.0]))
-            np.testing.assert_array_equal(read_lm.target_coordinates[0], np.array([100.0, 100.0]))
+            self.assertEqual(len(read_lm.source_x), 2)
+            self.assertEqual(len(read_lm.target_x), 2)
+            np.testing.assert_array_equal(read_lm.source_x[:], np.array([0.0, 10.0]))
+            np.testing.assert_array_equal(read_lm.source_y[:], np.array([0.0, 20.0]))
+            np.testing.assert_array_equal(read_lm.target_x[:], np.array([100.0, 110.0]))
+            np.testing.assert_array_equal(read_lm.target_y[:], np.array([100.0, 120.0]))
 
     def test_roundtrip_with_labels_and_confidence(self):
         """Landmarks with labels and confidence can be written and read back."""
@@ -241,17 +247,20 @@ class TestLandmarksRoundtrip(TestCase):
             description="Detailed landmarks",
         )
         lm.add_row(
-            source_coordinates=np.array([0.0, 0.0]),
+            source_x=0.0,
+            source_y=0.0,
             landmark_labels="Bregma",
             confidence=0.95,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
+            source_x=10.0,
+            source_y=20.0,
             landmark_labels="Lambda",
             confidence=0.87,
         )
         lm.add_row(
-            source_coordinates=np.array([20.0, 30.0]),
+            source_x=20.0,
+            source_y=30.0,
             landmark_labels="Interaural",
             confidence=0.92,
         )
@@ -287,8 +296,8 @@ class TestLandmarksRoundtrip(TestCase):
             description="Landmarks linked to transformation",
             transformation=rt,
         )
-        lm.add_row(source_coordinates=np.array([0.0, 0.0]))
-        lm.add_row(source_coordinates=np.array([10.0, 10.0]))
+        lm.add_row(source_x=0.0, source_y=0.0)
+        lm.add_row(source_x=10.0, source_y=10.0)
 
         meta = SpatialTransformationMetadata(name="spatial_meta_landmarks_linked")
         meta.add_spatial_transformations(spatial_transformations=rt)
@@ -320,14 +329,18 @@ class TestLandmarksRoundtrip(TestCase):
             transformation=rt,
         )
         lm.add_row(
-            source_coordinates=np.array([0.0, 0.0]),
-            target_coordinates=np.array([10.0, 10.0]),
+            source_x=0.0,
+            source_y=0.0,
+            target_x=10.0,
+            target_y=10.0,
             landmark_labels="Point1",
             confidence=0.9,
         )
         lm.add_row(
-            source_coordinates=np.array([20.0, 20.0]),
-            target_coordinates=np.array([30.0, 30.0]),
+            source_x=20.0,
+            source_y=20.0,
+            target_x=30.0,
+            target_y=30.0,
             landmark_labels="Point2",
             confidence=0.85,
         )
@@ -345,8 +358,8 @@ class TestLandmarksRoundtrip(TestCase):
             read_meta = read_nwbfile.lab_meta_data["spatial_meta_landmarks_complete"]
             read_lm = read_meta.landmarks["landmarks_complete"]
 
-            self.assertEqual(len(read_lm.source_coordinates), 2)
-            self.assertEqual(len(read_lm.target_coordinates), 2)
+            self.assertEqual(len(read_lm.source_x), 2)
+            self.assertEqual(len(read_lm.target_x), 2)
             self.assertEqual(len(read_lm.landmark_labels), 2)
             self.assertEqual(len(read_lm.confidence), 2)
             self.assertIsNotNone(read_lm.transformation)
@@ -372,11 +385,13 @@ class TestLandmarksRoundtrip(TestCase):
             source_image=source_img,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
+            source_x=10.0,
+            source_y=20.0,
             landmark_labels="Point1",
         )
         lm.add_row(
-            source_coordinates=np.array([30.0, 40.0]),
+            source_x=30.0,
+            source_y=40.0,
             landmark_labels="Point2",
         )
 
@@ -424,14 +439,18 @@ class TestLandmarksRoundtrip(TestCase):
             target_image=target_img,
         )
         lm.add_row(
-            source_coordinates=np.array([10.0, 20.0]),
-            target_coordinates=np.array([15.0, 25.0]),
+            source_x=10.0,
+            source_y=20.0,
+            target_x=15.0,
+            target_y=25.0,
             landmark_labels="Bregma",
             confidence=0.95,
         )
         lm.add_row(
-            source_coordinates=np.array([50.0, 60.0]),
-            target_coordinates=np.array([55.0, 65.0]),
+            source_x=50.0,
+            source_y=60.0,
+            target_x=55.0,
+            target_y=65.0,
             landmark_labels="Lambda",
             confidence=0.88,
         )
@@ -457,10 +476,10 @@ class TestLandmarksRoundtrip(TestCase):
             self.assertEqual(read_lm.target_image.data.shape, (128, 128))
 
             # Verify landmarks data is preserved
-            self.assertEqual(len(read_lm.source_coordinates), 2)
-            self.assertEqual(len(read_lm.target_coordinates), 2)
-            np.testing.assert_array_equal(read_lm.source_coordinates[0], np.array([10.0, 20.0]))
-            np.testing.assert_array_equal(read_lm.target_coordinates[0], np.array([15.0, 25.0]))
+            self.assertEqual(len(read_lm.source_x), 2)
+            self.assertEqual(len(read_lm.target_x), 2)
+            np.testing.assert_array_equal(read_lm.source_x[:], np.array([10.0, 50.0]))
+            np.testing.assert_array_equal(read_lm.target_x[:], np.array([15.0, 55.0]))
 
     def test_roundtrip_with_transformation_and_images(self):
         """Landmarks with transformation and image links can be written and read back."""
@@ -500,8 +519,10 @@ class TestLandmarksRoundtrip(TestCase):
             target_image=target_img,
         )
         lm.add_row(
-            source_coordinates=np.array([50.0, 100.0]),
-            target_coordinates=np.array([60.0, 110.0]),
+            source_x=50.0,
+            source_y=100.0,
+            target_x=60.0,
+            target_y=110.0,
             landmark_labels="Landmark1",
             confidence=0.92,
         )
@@ -535,7 +556,8 @@ class TestLandmarksRoundtrip(TestCase):
             self.assertEqual(read_lm.source_image.data.shape, (200, 200))
 
             # Verify landmarks data
-            self.assertEqual(len(read_lm.source_coordinates), 1)
+            self.assertEqual(len(read_lm.source_x), 1)
+            self.assertEqual(len(read_lm.target_x), 1)
             self.assertEqual(read_lm.landmark_labels[0], "Landmark1")
             self.assertEqual(read_lm.confidence[0], 0.92)
 
@@ -599,11 +621,11 @@ class TestSpatialTransformationMetadataRoundtrip(TestCase):
         """SpatialTransformationMetadata with multiple landmark sets can be written and read back."""
         lm1 = Landmarks(name="landmarks_1", description="First set")
         for i in range(3):
-            lm1.add_row(source_coordinates=np.array([float(i), float(i * 2)]))
+            lm1.add_row(source_x=float(i), source_y=float(i * 2))
 
         lm2 = Landmarks(name="landmarks_2", description="Second set")
         for i in range(5):
-            lm2.add_row(source_coordinates=np.array([float(i + 10), float(i * 2 + 10)]))
+            lm2.add_row(source_x=float(i + 10), source_y=float(i * 2 + 10))
 
         meta = SpatialTransformationMetadata(name="multi_landmarks_meta")
         meta.add_landmarks(landmarks=lm1)
@@ -620,5 +642,5 @@ class TestSpatialTransformationMetadataRoundtrip(TestCase):
             self.assertEqual(len(read_meta.landmarks), 2)
             self.assertIn("landmarks_1", read_meta.landmarks)
             self.assertIn("landmarks_2", read_meta.landmarks)
-            self.assertEqual(len(read_meta.landmarks["landmarks_1"].source_coordinates), 3)
-            self.assertEqual(len(read_meta.landmarks["landmarks_2"].source_coordinates), 5)
+            self.assertEqual(len(read_meta.landmarks["landmarks_1"].source_x), 3)
+            self.assertEqual(len(read_meta.landmarks["landmarks_2"].source_x), 5)

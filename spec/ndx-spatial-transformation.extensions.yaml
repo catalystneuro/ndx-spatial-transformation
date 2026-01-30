@@ -74,7 +74,7 @@ groups:
   - neurodata_type_def: Landmarks
     neurodata_type_inc: DynamicTable
     doc: |
-      Spatial landmarks annotated on an image with their coordinates in both
+      Spatial landmarks annotated on an image with their pixel coordinates in both
       source and target spaces, along with the associated spatial transformation.
     links:
       - target_type: SpatialTransformation
@@ -92,32 +92,44 @@ groups:
         doc: "The target/registered image (optional)."
         name: target_image
 
-    datasets:
-      - name: source_coordinates
-        neurodata_type_inc: VectorData
-        dtype: float
-        doc: |
-          Coordinates of each landmark in the source space.
-          Shape: (n_landmarks, dimensionality)
-        dims:
-          - landmarks
-          - dimensions
-        shape:
-          - null
-          - null
+      - target_type: Image
+        quantity: "?"
+        doc: "The reference projection image (optional)."
+        name: reference_projection_image
 
-      - name: target_coordinates
+    datasets:
+      - name: source_x
         neurodata_type_inc: VectorData
         dtype: float
-        doc: |
-          Coordinates of each landmark in the target/registered space.
-          Shape: (n_landmarks, dimensionality)
-        dims:
-          - landmarks
-          - dimensions
-        shape:
-          - null
-          - null
+        doc: "X coordinate of each landmark in the source space (pixels)."
+
+      - name: source_y
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Y coordinate of each landmark in the source space (pixels)."
+
+      - name: target_x
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "X coordinate of each landmark in the target/registered space (pixels)."
+        quantity: "?" # optional dataset
+
+      - name: target_y
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Y coordinate of each landmark in the target/registered space (pixels)."
+        quantity: "?" # optional dataset
+
+      - name: reference_x
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "X coordinate of each landmark in the reference space (pixels)."
+        quantity: "?" # optional dataset
+
+      - name: reference_y
+        neurodata_type_inc: VectorData
+        dtype: float
+        doc: "Y coordinate of each landmark in the reference space (pixels)."
         quantity: "?" # optional dataset
 
       - name: landmark_labels
