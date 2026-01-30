@@ -79,26 +79,26 @@ spatial_transformation = AffineTransformation(
 
 # Generate example images
 source_image_data = np.random.randint(0, 256, size=(512, 512), dtype=np.uint8)
-target_image_data = im_apply_transform(im=source_image_data, M=SimilarityTransform(transform))
+output_image_data = im_apply_transform(im=source_image_data, M=SimilarityTransform(transform))
 
 # Wrap images in NWB containers
 source_image = GrayscaleImage(
     name="SourceImage",
-    description="Original widefield imaging frame",
+    description="Original widefield imaging frame (moving/subject image)",
     data=source_image_data,
 )
 
-target_image = GrayscaleImage(
-    name="TargetImage",
-    description="Transformed frame aligned to Allen CCF coordinates",
-    data=target_image_data,
+output_image = GrayscaleImage(
+    name="OutputImage",
+    description="Transformed output frame (source warped/registered into the reference/atlas space)",
+    data=output_image_data,
 )
 
 # Add images to NWB file
 images = Images(
     name="Images",
-    images=[source_image, target_image],
-    description="Source and target images showing spatial transformation",
+    images=[source_image, output_image],
+    description="Source (moving/subject) and output (transformed) images demonstrating the spatial transformation",
 )
 nwbfile.add_acquisition(images)
 
@@ -109,7 +109,7 @@ landmarks_definitions = {
         "y": [381.428925, 302.164284, 226.593808, 301.863883],
         "name": ["OB_left", "OB_center", "OB_right", "RSP_base"],
     },
-    "target": {
+    "output": {
         "x": [219.484536, 320.000000, 420.515464, 320.000000],
         "y": [92.164948, 92.164948, 92.164948, 434.948454],
         "name": ["OB_left", "OB_center", "OB_right", "RSP_base"],
@@ -119,9 +119,9 @@ landmarks_definitions = {
 # Create landmarks table
 landmarks_table = Landmarks(
     name="Landmarks",
-    description="Anatomical landmarks for Allen CCF alignment",
+    description="Anatomical landmarks used for alignment between the moving/subject image (source) and the reference/atlas space",
     source_image=source_image,
-    target_image=target_image,
+    output_image=output_image,
 )
 
 # Populate landmarks table
@@ -129,8 +129,8 @@ for i in range(4):
     landmarks_table.add_row(
         source_x=landmarks_definitions["source"]["x"][i],
         source_y=landmarks_definitions["source"]["y"][i],
-        target_x=landmarks_definitions["target"]["x"][i],
-        target_y=landmarks_definitions["target"]["y"][i],
+        output_x=landmarks_definitions["output"]["x"][i],
+        output_y=landmarks_definitions["output"]["y"][i],
         landmark_labels=landmarks_definitions["source"]["name"][i],
     )
 

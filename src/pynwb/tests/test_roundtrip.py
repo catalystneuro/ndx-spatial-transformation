@@ -203,25 +203,25 @@ class TestLandmarksRoundtrip(TestCase):
             np.testing.assert_array_equal(read_lm.source_y[:], np.array([0.0, 10.0, 20.0]))
 
     def test_roundtrip_with_target_coordinates(self):
-        """Landmarks with target coordinates can be written and read back."""
+        """Landmarks with output coordinates can be written and read back."""
         lm = Landmarks(
-            name="landmarks_with_target",
-            description="Landmarks with target coordinates",
+            name="landmarks_with_output",
+            description="Landmarks with output coordinates",
         )
         lm.add_row(
             source_x=0.0,
             source_y=0.0,
-            target_x=100.0,
-            target_y=100.0,
+            output_x=100.0,
+            output_y=100.0,
         )
         lm.add_row(
             source_x=10.0,
             source_y=20.0,
-            target_x=110.0,
-            target_y=120.0,
+            output_x=110.0,
+            output_y=120.0,
         )
 
-        meta = SpatialTransformationMetadata(name="spatial_meta_landmarks_target")
+        meta = SpatialTransformationMetadata(name="spatial_meta_landmarks_output")
         meta.add_landmarks(landmarks=lm)
         self.nwbfile.add_lab_meta_data(meta)
 
@@ -230,15 +230,15 @@ class TestLandmarksRoundtrip(TestCase):
 
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
-            read_meta = read_nwbfile.lab_meta_data["spatial_meta_landmarks_target"]
-            read_lm = read_meta.landmarks["landmarks_with_target"]
+            read_meta = read_nwbfile.lab_meta_data["spatial_meta_landmarks_output"]
+            read_lm = read_meta.landmarks["landmarks_with_output"]
 
             self.assertEqual(len(read_lm.source_x), 2)
-            self.assertEqual(len(read_lm.target_x), 2)
+            self.assertEqual(len(read_lm.output_x), 2)
             np.testing.assert_array_equal(read_lm.source_x[:], np.array([0.0, 10.0]))
             np.testing.assert_array_equal(read_lm.source_y[:], np.array([0.0, 20.0]))
-            np.testing.assert_array_equal(read_lm.target_x[:], np.array([100.0, 110.0]))
-            np.testing.assert_array_equal(read_lm.target_y[:], np.array([100.0, 120.0]))
+            np.testing.assert_array_equal(read_lm.output_x[:], np.array([100.0, 110.0]))
+            np.testing.assert_array_equal(read_lm.output_y[:], np.array([100.0, 120.0]))
 
     def test_roundtrip_with_labels_and_confidence(self):
         """Landmarks with labels and confidence can be written and read back."""
@@ -331,16 +331,16 @@ class TestLandmarksRoundtrip(TestCase):
         lm.add_row(
             source_x=0.0,
             source_y=0.0,
-            target_x=10.0,
-            target_y=10.0,
+            output_x=10.0,
+            output_y=10.0,
             landmark_labels="Point1",
             confidence=0.9,
         )
         lm.add_row(
             source_x=20.0,
             source_y=20.0,
-            target_x=30.0,
-            target_y=30.0,
+            output_x=30.0,
+            output_y=30.0,
             landmark_labels="Point2",
             confidence=0.85,
         )
@@ -359,7 +359,7 @@ class TestLandmarksRoundtrip(TestCase):
             read_lm = read_meta.landmarks["landmarks_complete"]
 
             self.assertEqual(len(read_lm.source_x), 2)
-            self.assertEqual(len(read_lm.target_x), 2)
+            self.assertEqual(len(read_lm.output_x), 2)
             self.assertEqual(len(read_lm.landmark_labels), 2)
             self.assertEqual(len(read_lm.confidence), 2)
             self.assertIsNotNone(read_lm.transformation)
@@ -412,7 +412,7 @@ class TestLandmarksRoundtrip(TestCase):
             self.assertEqual(read_lm.source_image.data.shape, (100, 100))
 
     def test_roundtrip_with_both_images(self):
-        """Landmarks linked to both source and target images can be written and read back."""
+        """Landmarks linked to both source and output images can be written and read back."""
         from pynwb.image import GrayscaleImage
         from pynwb.base import Images
 
@@ -422,35 +422,35 @@ class TestLandmarksRoundtrip(TestCase):
             description="Source image",
         )
 
-        target_img = GrayscaleImage(
-            name="target_image",
+        output_img = GrayscaleImage(
+            name="output_image",
             data=np.random.randint(0, 255, (128, 128), dtype=np.uint8),
-            description="Target/registered image",
+            description="Output/transformed image",
         )
 
         # Add images to NWB file
-        images = Images(name="LandmarkImages", images=[source_img, target_img])
+        images = Images(name="LandmarkImages", images=[source_img, output_img])
         self.nwbfile.add_acquisition(images)
 
         lm = Landmarks(
             name="landmarks_with_both_images",
             description="Landmarks with both images",
             source_image=source_img,
-            target_image=target_img,
+            output_image=output_img,
         )
         lm.add_row(
             source_x=10.0,
             source_y=20.0,
-            target_x=15.0,
-            target_y=25.0,
+            output_x=15.0,
+            output_y=25.0,
             landmark_labels="Bregma",
             confidence=0.95,
         )
         lm.add_row(
             source_x=50.0,
             source_y=60.0,
-            target_x=55.0,
-            target_y=65.0,
+            output_x=55.0,
+            output_y=65.0,
             landmark_labels="Lambda",
             confidence=0.88,
         )
@@ -469,17 +469,17 @@ class TestLandmarksRoundtrip(TestCase):
 
             # Verify both image links
             self.assertIsNotNone(read_lm.source_image)
-            self.assertIsNotNone(read_lm.target_image)
+            self.assertIsNotNone(read_lm.output_image)
             self.assertEqual(read_lm.source_image.name, "source_image")
-            self.assertEqual(read_lm.target_image.name, "target_image")
+            self.assertEqual(read_lm.output_image.name, "output_image")
             self.assertEqual(read_lm.source_image.data.shape, (128, 128))
-            self.assertEqual(read_lm.target_image.data.shape, (128, 128))
+            self.assertEqual(read_lm.output_image.data.shape, (128, 128))
 
             # Verify landmarks data is preserved
             self.assertEqual(len(read_lm.source_x), 2)
-            self.assertEqual(len(read_lm.target_x), 2)
+            self.assertEqual(len(read_lm.output_x), 2)
             np.testing.assert_array_equal(read_lm.source_x[:], np.array([10.0, 50.0]))
-            np.testing.assert_array_equal(read_lm.target_x[:], np.array([15.0, 55.0]))
+            np.testing.assert_array_equal(read_lm.output_x[:], np.array([15.0, 55.0]))
 
     def test_roundtrip_with_transformation_and_images(self):
         """Landmarks with transformation and image links can be written and read back."""
@@ -501,14 +501,14 @@ class TestLandmarksRoundtrip(TestCase):
             description="Source image",
         )
 
-        target_img = GrayscaleImage(
-            name="target_image",
+        output_img = GrayscaleImage(
+            name="output_image",
             data=np.random.randint(0, 255, (200, 200), dtype=np.uint8),
-            description="Transformed target image",
+            description="Output/transformed image",
         )
 
         # Add images to NWB file
-        images = Images(name="LandmarkImages", images=[source_img, target_img])
+        images = Images(name="LandmarkImages", images=[source_img, output_img])
         self.nwbfile.add_acquisition(images)
 
         lm = Landmarks(
@@ -516,13 +516,13 @@ class TestLandmarksRoundtrip(TestCase):
             description="Landmarks with all possible links",
             transformation=rt,
             source_image=source_img,
-            target_image=target_img,
+            output_image=output_img,
         )
         lm.add_row(
             source_x=50.0,
             source_y=100.0,
-            target_x=60.0,
-            target_y=110.0,
+            output_x=60.0,
+            output_y=110.0,
             landmark_labels="Landmark1",
             confidence=0.92,
         )
@@ -543,7 +543,7 @@ class TestLandmarksRoundtrip(TestCase):
             # Verify all links are preserved
             self.assertIsNotNone(read_lm.transformation)
             self.assertIsNotNone(read_lm.source_image)
-            self.assertIsNotNone(read_lm.target_image)
+            self.assertIsNotNone(read_lm.output_image)
 
             # Verify transformation
             self.assertEqual(read_lm.transformation.name, "rigid_with_images")
@@ -552,12 +552,12 @@ class TestLandmarksRoundtrip(TestCase):
 
             # Verify images
             self.assertEqual(read_lm.source_image.name, "source_image")
-            self.assertEqual(read_lm.target_image.name, "target_image")
+            self.assertEqual(read_lm.output_image.name, "output_image")
             self.assertEqual(read_lm.source_image.data.shape, (200, 200))
 
             # Verify landmarks data
             self.assertEqual(len(read_lm.source_x), 1)
-            self.assertEqual(len(read_lm.target_x), 1)
+            self.assertEqual(len(read_lm.output_x), 1)
             self.assertEqual(read_lm.landmark_labels[0], "Landmark1")
             self.assertEqual(read_lm.confidence[0], 0.92)
 
