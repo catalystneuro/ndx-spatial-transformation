@@ -126,13 +126,13 @@ class TestLandmarksConstructors(TestCase):
         self.rotation_matrix = ROTATION_MATRIX_2D
         self.translation = TRANSLATION_VECTOR_2D
         self.source_coordinates = np.array([[0.0, 0.0], [5.0, 5.0]])
-        self.target_coordinates = np.array([[10.0, 20.0], [15.0, 25.0]])
+        self.output_coordinates = np.array([[10.0, 20.0], [15.0, 25.0]])
 
         # Convenience split columns for the updated schema
         self.source_x = self.source_coordinates[:, 0]
         self.source_y = self.source_coordinates[:, 1]
-        self.target_x = self.target_coordinates[:, 0]
-        self.target_y = self.target_coordinates[:, 1]
+        self.output_x = self.output_coordinates[:, 0]
+        self.output_y = self.output_coordinates[:, 1]
 
     def test_constructor_basic(self):
         """Landmarks can be constructed with minimal required data."""
@@ -160,23 +160,23 @@ class TestLandmarksConstructors(TestCase):
         np.testing.assert_array_equal(lm.source_y[:], self.source_y)
 
     def test_constructor_with_target_coordinates(self):
-        """Landmarks can include target coordinates for registered landmarks."""
-        lm = Landmarks(name="landmarks", description="Landmarks with target coordinates")
+        """Landmarks can include output coordinates for transformed landmarks."""
+        lm = Landmarks(name="landmarks", description="Landmarks with output coordinates")
 
-        for source_coord, target_coord in zip(self.source_coordinates, self.target_coordinates):
+        for source_coord, output_coord in zip(self.source_coordinates, self.output_coordinates):
             lm.add_row(
                 source_x=float(source_coord[0]),
                 source_y=float(source_coord[1]),
-                target_x=float(target_coord[0]),
-                target_y=float(target_coord[1]),
+                output_x=float(output_coord[0]),
+                output_y=float(output_coord[1]),
             )
 
         self.assertEqual(len(lm.source_x), len(self.source_coordinates))
         np.testing.assert_array_equal(lm.source_x[:], self.source_x)
         np.testing.assert_array_equal(lm.source_y[:], self.source_y)
-        self.assertEqual(len(lm.target_x), len(self.target_coordinates))
-        np.testing.assert_array_equal(lm.target_x[:], self.target_x)
-        np.testing.assert_array_equal(lm.target_y[:], self.target_y)
+        self.assertEqual(len(lm.output_x), len(self.output_coordinates))
+        np.testing.assert_array_equal(lm.output_x[:], self.output_x)
+        np.testing.assert_array_equal(lm.output_y[:], self.output_y)
 
     def test_constructor_with_transformation_link(self):
         """Landmarks can be linked to a SpatialTransformation."""
@@ -243,27 +243,27 @@ class TestLandmarksConstructors(TestCase):
         self.assertEqual(lm.source_image.data.shape, (100, 100))
 
     def test_constructor_with_target_image(self):
-        """Landmarks can be linked to a target image."""
+        """Landmarks can be linked to an output image."""
         from pynwb.image import GrayscaleImage
 
-        target_img = GrayscaleImage(
-            name="target_image",
+        output_img = GrayscaleImage(
+            name="output_image",
             data=np.random.randint(0, 255, (100, 100), dtype=np.uint8),
-            description="Target image for landmarks",
+            description="Output/transformed image for landmarks",
         )
 
         lm = Landmarks(
-            name="landmarks_with_target_image",
-            description="Landmarks with target image link",
-            target_image=target_img,
+            name="landmarks_with_output_image",
+            description="Landmarks with output image link",
+            output_image=output_img,
         )
         lm.add_row(source_x=10.0, source_y=20.0)
 
-        self.assertIsNotNone(lm.target_image)
-        self.assertEqual(lm.target_image.name, "target_image")
+        self.assertIsNotNone(lm.output_image)
+        self.assertEqual(lm.output_image.name, "output_image")
 
     def test_constructor_with_both_images(self):
-        """Landmarks can be linked to both source and target images."""
+        """Landmarks can be linked to both source and output images."""
         from pynwb.image import GrayscaleImage
 
         source_img = GrayscaleImage(
@@ -272,35 +272,35 @@ class TestLandmarksConstructors(TestCase):
             description="Source image",
         )
 
-        target_img = GrayscaleImage(
-            name="target_image",
+        output_img = GrayscaleImage(
+            name="output_image",
             data=np.random.randint(0, 255, (100, 100), dtype=np.uint8),
-            description="Target image",
+            description="Output/transformed image",
         )
 
         lm = Landmarks(
             name="landmarks_with_both_images",
             description="Landmarks with both image links",
             source_image=source_img,
-            target_image=target_img,
+            output_image=output_img,
         )
         lm.add_row(
             source_x=10.0,
             source_y=20.0,
-            target_x=15.0,
-            target_y=25.0,
+            output_x=15.0,
+            output_y=25.0,
         )
         lm.add_row(
             source_x=50.0,
             source_y=60.0,
-            target_x=55.0,
-            target_y=65.0,
+            output_x=55.0,
+            output_y=65.0,
         )
 
         self.assertIsNotNone(lm.source_image)
-        self.assertIsNotNone(lm.target_image)
+        self.assertIsNotNone(lm.output_image)
         self.assertEqual(lm.source_image.name, "source_image")
-        self.assertEqual(lm.target_image.name, "target_image")
+        self.assertEqual(lm.output_image.name, "output_image")
 
     def test_constructor_with_transformation_and_images(self):
         """Landmarks can be linked to transformation and images simultaneously."""
@@ -320,10 +320,10 @@ class TestLandmarksConstructors(TestCase):
             description="Source image",
         )
 
-        target_img = GrayscaleImage(
-            name="target_image",
+        output_img = GrayscaleImage(
+            name="output_image",
             data=np.random.randint(0, 255, (100, 100), dtype=np.uint8),
-            description="Target image",
+            description="Output/transformed image",
         )
 
         lm = Landmarks(
@@ -331,23 +331,23 @@ class TestLandmarksConstructors(TestCase):
             description="Landmarks with all links",
             transformation=rt,
             source_image=source_img,
-            target_image=target_img,
+            output_image=output_img,
         )
         lm.add_row(
             source_x=10.0,
             source_y=20.0,
-            target_x=15.0,
-            target_y=25.0,
+            output_x=15.0,
+            output_y=25.0,
             landmark_labels="Point1",
             confidence=0.95,
         )
 
         self.assertIsNotNone(lm.transformation)
         self.assertIsNotNone(lm.source_image)
-        self.assertIsNotNone(lm.target_image)
+        self.assertIsNotNone(lm.output_image)
         self.assertEqual(lm.transformation.name, "rigid_transform")
         self.assertEqual(lm.source_image.name, "source_image")
-        self.assertEqual(lm.target_image.name, "target_image")
+        self.assertEqual(lm.output_image.name, "output_image")
 
 
 class TestSpatialTransformationMetadataConstructor(TestCase):
